@@ -91,6 +91,7 @@ function onOpen() {
     .addItem('Нові зверху (відсортувати)', 'sortNewestFirst')
     .addItem('Показати секрет для сайту', 'showSecret')
     .addItem('Додати тестову заявку', 'addTestLead')
+    .addItem('Додати демо-дані (80 заявок)', 'seedDemoData')
     .addItem('Видалити тестові заявки', 'deleteTestLeads')
     .addToUi();
 }
@@ -269,10 +270,12 @@ function argSep_(sh) {
 
 function buildStats_(ss) {
   var sh = ss.getSheetByName(STATS_SHEET) || ss.insertSheet(STATS_SHEET);
+  sh.getCharts().forEach(function (ch) { sh.removeChart(ch); });
   sh.clear();
+  if (sh.getMaxColumns() < 30) sh.insertColumnsAfter(sh.getMaxColumns(), 30 - sh.getMaxColumns());
   sh.setHiddenGridlines(true);
   sh.setTabColor(INK);
-  sh.getRange(1, 1, 60, 13).setFontFamily('Nunito').setFontSize(10).setFontColor(INK).setVerticalAlignment('middle');
+  sh.getRange(1, 1, 90, 30).setFontFamily('Nunito').setFontSize(10).setFontColor(INK).setVerticalAlignment('middle');
   [190, 90, 90, 40, 190, 90, 90, 40, 190, 90, 90].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
 
   // у формулах аргументи розділяємо знаком «¦» — fx() замінює його на роздільник локалі таблиці
@@ -310,12 +313,12 @@ function buildStats_(ss) {
 
   // Розрізи: QUERY сам розтягується під кількість рядків; «Клієнтів» — окрема колонка формул
   var blocks = [
-    { title: 'За джерелами', row: 13, col: 1, key: 'source', label: 'Джерело' },
-    { title: 'За кампаніями', row: 13, col: 5, key: 'campaign', label: 'Кампанія' },
-    { title: 'За курсами академії', row: 13, col: 9, key: 'program', label: 'Курс' },
-    { title: 'За сторінками з формою', row: 30, col: 1, key: 'pageLabel', label: 'Сторінка' },
-    { title: 'За типом заявки', row: 30, col: 5, key: 'type', label: 'Тип' },
-    { title: 'За днями (останні 14)', row: 30, col: 9, key: 'day', label: 'День', days: true }
+    { title: 'За джерелами', row: 39, col: 1, key: 'source', label: 'Джерело' },
+    { title: 'За кампаніями', row: 39, col: 5, key: 'campaign', label: 'Кампанія' },
+    { title: 'За курсами академії', row: 39, col: 9, key: 'program', label: 'Курс' },
+    { title: 'За сторінками з формою', row: 56, col: 1, key: 'pageLabel', label: 'Сторінка' },
+    { title: 'За типом заявки', row: 56, col: 5, key: 'type', label: 'Тип' },
+    { title: 'За днями (останні 14)', row: 56, col: 9, key: 'day', label: 'День', days: true }
   ];
   var idL = colLetter_('id');
   blocks.forEach(function (b) {
@@ -341,8 +344,175 @@ function buildStats_(ss) {
     }
     sh.getRange(b.row + 2, b.col, 14, b.days ? 2 : 3).setBorder(null, null, true, null, null, true, LINE, SpreadsheetApp.BorderStyle.SOLID);
   });
+  buildCharts_(sh, blocks, created, status, fx);
   sh.setFrozenRows(2);
   return sh;
+}
+
+/**
+ * Графіки. Дані для двох з них (заявки по днях, статуси) рахуються в службових колонках W:AB праворуч,
+ * решта беруть готові таблиці розрізів нижче.
+ */
+function buildCharts_(sh, blocks, created, status, fx) {
+  var W = 23; // колонка W
+  sh.getRange(3, W).setValue('Дані для графіків (не редагувати)').setFontColor(TECH).setFontSize(9).setFontWeight('bold');
+  sh.getRange(4, W, 1, 3).setValues([['Дата', 'День', 'Заявок']]);
+  sh.getRange(4, W + 4, 1, 2).setValues([['Статус', 'Заявок']]);
+  sh.getRange(4, W, 1, 6).setFontColor(TECH).setFontSize(9).setFontWeight('bold');
+  var dayRows = [];
+  for (var i = 0; i < 30; i++) {
+    var r = 5 + i, d = 'W' + r;
+    dayRows.push([
+      '=TODAY()-' + (29 - i),
+      fx('=RIGHT("0"&DAY(' + d + ')¦2)&"."&RIGHT("0"&MONTH(' + d + ')¦2)'),
+      fx('=COUNTIFS(' + created + '¦">="&' + d + '¦' + created + '¦"<"&(' + d + '+1))')
+    ]);
+  }
+  sh.getRange(5, W, 30, 3).setFormulas(dayRows);
+  sh.getRange(5, W, 30, 1).setNumberFormat('dd.mm.yyyy');
+  var stNames = Object.keys(STATUSES);
+  var stRows = stNames.map(function (n, k) { return [n, fx('=COUNTIF(' + status + '¦AA' + (5 + k) + ')')]; });
+  sh.getRange(5, W + 4, stNames.length, 2).setValues(stRows.map(function (x) { return [x[0], '']; }));
+  sh.getRange(5, W + 5, stNames.length, 1).setFormulas(stRows.map(function (x) { return [x[1]]; }));
+  sh.getRange(5, W, 30, 6).setFontColor(TECH).setFontSize(9);
+  [90, 60, 70, 20, 110, 70].forEach(function (w, k) { sh.setColumnWidth(W + k, w); });
+
+  var base = { titleTextStyle: { color: INK, fontSize: 13, bold: true }, legend: { position: 'none' }, backgroundColor: '#FFFFFF',
+               chartArea: { left: 44, top: 44, right: 16, bottom: 34 } };
+  function opts(chart, o) {
+    var all = {}; Object.keys(base).forEach(function (k) { all[k] = base[k]; }); Object.keys(o).forEach(function (k) { all[k] = o[k]; });
+    Object.keys(all).forEach(function (k) { chart.setOption(k, all[k]); });
+    return chart;
+  }
+  function put(chart, row, col, w, h) { sh.insertChart(chart.setPosition(row, col, 4, 4).setOption('width', w).setOption('height', h).build()); }
+  function block(key) { return blocks.filter(function (b) { return b.key === key; })[0]; }
+  function top(b, n) { return sh.getRange(b.row + 1, b.col, n + 1, 2); }
+
+  // ряд 1: динаміка (широкий) + статуси (бублик)
+  put(opts(sh.newChart().asColumnChart().addRange(sh.getRange(4, W + 1, 31, 2)).setNumHeaders(1),
+    { title: 'Заявки по днях (30 днів)', colors: [BRAND], vAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, hAxis: { textStyle: { fontSize: 9 }, showTextEvery: 2 }, bar: { groupWidth: '70%' } }),
+    13, 1, 820, 250);
+  put(opts(sh.newChart().asPieChart().addRange(sh.getRange(4, W + 4, stNames.length + 1, 2)).setNumHeaders(1),
+    { title: 'Статуси заявок', pieHole: 0.55, legend: { position: 'right', textStyle: { fontSize: 10 } }, pieSliceText: 'value', chartArea: { left: 12, top: 44, right: 12, bottom: 12 },
+      colors: ['#FF2D7E', '#F5B301', '#3D7BFF', '#1FB56B', '#A7ABBA', '#6B7080'] }),
+    13, 9, 400, 250);
+
+  // ряд 2: розрізи
+  put(opts(sh.newChart().asBarChart().addRange(top(block('source'), 8)).setNumHeaders(1),
+    { title: 'Заявки за джерелами', colors: [BRAND], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 150, top: 44, right: 16, bottom: 24 } }),
+    26, 1, 400, 250);
+  put(opts(sh.newChart().asBarChart().addRange(top(block('campaign'), 8)).setNumHeaders(1),
+    { title: 'Заявки за кампаніями', colors: ['#3D7BFF'], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 150, top: 44, right: 16, bottom: 24 } }),
+    26, 5, 400, 250);
+  put(opts(sh.newChart().asBarChart().addRange(top(block('pageLabel'), 8)).setNumHeaders(1),
+    { title: 'Звідки заявки (сторінка з формою)', colors: ['#1FB56B'], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 170, top: 44, right: 16, bottom: 24 } }),
+    26, 9, 400, 250);
+}
+
+/** Вигадані заявки за 30 днів — щоб побачити, як виглядають таблиця, фільтри, «Аналітика» й графіки. ID = TEST…, тому видаляються кнопкою нижче. */
+function seedDemoData() {
+  var ui = SpreadsheetApp.getUi();
+  var N = 80;
+  if (ui.alert('Демо-дані', 'Додати ' + N + ' вигаданих заявок за останні 30 днів для перевірки таблиці, «Аналітики» й графіків?\n\nЇх можна прибрати меню «Видалити тестові заявки».', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) { setup(); sheet = ss.getSheetByName(SHEET_NAME); }
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var leads = demoLeads_(N);
+    var start = sheet.getLastRow() + 1;
+    if (start + N - 1 > MAX_ROWS + 1) throw new Error('Не вистачає місця в таблиці.');
+    var rows = leads.map(leadToRow_);
+    sheet.getRange(start, 1, N, COLUMNS.length).setValues(rows);
+    // клікабельні контакти й посилання — одним викликом на колонку
+    ['contact', 'link'].forEach(function (key) {
+      var rich = leads.map(function (l) {
+        var text = l[key] || '';
+        var url = key === 'contact' ? contactUrl_(text) : siteUrl_(text);
+        var b = SpreadsheetApp.newRichTextValue().setText(text);
+        if (url && text) b.setLinkUrl(url);
+        return [b.build()];
+      });
+      sheet.getRange(start, colIndex_(key), N, 1).setRichTextValues(rich);
+    });
+  } finally {
+    lock.releaseLock();
+  }
+  ss.toast('Додано ' + N + ' демо-заявок. Перегляньте аркуш «' + STATS_SHEET + '».', 'marketingpro', 8);
+}
+
+function demoLeads_(n) {
+  var pick = function (a) { return a[Math.floor(Math.random() * a.length)]; };
+  var chance = function (p) { return Math.random() < p; };
+  var digits = function (k) { var s = ''; for (var i = 0; i < k; i++) s += Math.floor(Math.random() * 10); return s; };
+  var names = ['Олена', 'Марія', 'Андрій', 'Ірина', 'Дмитро', 'Наталя', 'Олексій', 'Юлія', 'Катерина', 'Віталій', 'Оксана', 'Сергій', 'Анна', 'Тарас', 'Вікторія', 'Максим'];
+  var niches = ['бьюті-студія', 'інтернет-магазин одягу', 'стоматологія', 'фітнес-клуб', 'меблі на замовлення', 'школа англійської', 'квіти', 'нерухомість', 'кав’ярня', 'автосервіс', 'косметологія', 'онлайн-курси'];
+  var geo = [['UA', 'Київ', '30'], ['UA', 'Київ', '30'], ['UA', 'Львів', '46'], ['UA', 'Дніпро', '12'], ['UA', 'Одеса', '51'], ['UA', 'Харків', '63'], ['PL', 'Warszawa', '14'], ['DE', 'Berlin', 'BE']];
+  var devices = ['Телефон · iOS · Instagram (застосунок)', 'Телефон · Android · Chrome', 'Телефон · iOS · Safari', 'Комп’ютер · Windows · Chrome', 'Комп’ютер · macOS · Safari', 'Телефон · Android · Facebook (застосунок)'];
+  var cases = ['Стоматологічна клініка', 'Студія краси повного циклу', 'Мережа магазинів квітів', 'Виробництво меблів', 'Український бренд одягу з власним виробництвом', 'Школа іноземних мов'];
+  var programs = ['Для власників бізнесу · 5 тижнів', 'Карʼєра в таргеті · 10 тижнів'];
+  var sources = [
+    { w: 38, source: 'meta', medium: 'cpc', campaigns: ['sept_leadgen', 'sept_retarget', 'academy_launch'], click: true },
+    { w: 16, source: 'instagram', medium: 'social', campaigns: ['bio_link', 'stories'] },
+    { w: 14, source: 'google', medium: 'organic', campaigns: [''] },
+    { w: 12, source: 'telegram', medium: 'social', campaigns: ['channel_post'] },
+    { w: 14, source: 'direct', medium: '', campaigns: [''] },
+    { w: 6, source: 'partner.ua', medium: 'referral', campaigns: [''] }
+  ];
+  var totalW = sources.reduce(function (a, x) { return a + x.w; }, 0);
+  var pickSource = function () { var r = Math.random() * totalW; for (var i = 0; i < sources.length; i++) { r -= sources[i].w; if (r <= 0) return sources[i]; } return sources[0]; };
+  var statusFor = function (age) {
+    var r = Math.random();
+    if (age < 1.5) return r < 0.7 ? 'Новий' : r < 0.9 ? 'Зв’язались' : 'В роботі';
+    if (age < 7) return r < 0.2 ? 'Новий' : r < 0.4 ? 'Зв’язались' : r < 0.7 ? 'В роботі' : r < 0.82 ? 'Клієнт' : r < 0.95 ? 'Відмова' : 'Спам';
+    return r < 0.05 ? 'Новий' : r < 0.15 ? 'Зв’язались' : r < 0.3 ? 'В роботі' : r < 0.5 ? 'Клієнт' : r < 0.85 ? 'Відмова' : 'Спам';
+  };
+  var used = {}, list = [];
+  for (var i = 0; i < n; i++) {
+    var age = Math.pow(Math.random(), 0.8) * 30; // трохи більше свіжих
+    var src = pickSource(), g = pick(geo), academy = chance(0.28);
+    var name = chance(0.9) ? pick(names) : '';
+    var link = chance(0.7) ? (chance(0.8) ? 'instagram.com/' + pick(['beauty', 'shop', 'studio', 'clinic', 'fit', 'flowers']) + '_' + digits(3) : 'https://' + pick(['moda', 'dent', 'mebli', 'kava']) + digits(2) + '.com.ua') : '';
+    var niche = chance(0.65) ? pick(niches) : '';
+    var pages = 1 + Math.floor(Math.random() * 9), secs = 20 + Math.floor(Math.random() * 500);
+    var id; do { id = 'TEST' + digits(4); } while (used[id]); used[id] = 1;
+    var seen = []; for (var k = 0, m = Math.floor(Math.random() * 4); k < m; k++) { var c = pick(cases); if (seen.indexOf(c) < 0) seen.push(c); }
+    var returning = chance(0.25);
+    list.push({
+      id: id,
+      createdAt: new Date(Date.now() - age * 86400000).toISOString(),
+      status: statusFor(age),
+      type: academy ? 'Академія' : 'Консультація',
+      program: academy ? pick(programs) : '',
+      name: name,
+      contact: chance(0.6) ? '+38 0' + pick(['50', '63', '66', '67', '68', '73', '93', '95', '96', '97', '98']) + ' ' + digits(3) + ' ' + digits(2) + ' ' + digits(2) : '@' + pick(['olena', 'andrii', 'maria', 'dima', 'iryna', 'taras', 'yulia']) + '_' + digits(3),
+      link: link,
+      niche: niche,
+      quality: [name, link, niche].filter(Boolean).length === 3 ? 'Повна' : [name, link, niche].filter(Boolean).length ? 'Часткова' : 'Лише контакт',
+      source: src.source,
+      medium: src.medium,
+      campaign: pick(src.campaigns),
+      clickId: src.click ? 'IwAR' + digits(6) : '',
+      pageLabel: academy ? 'Академія' : pick(['Головна', 'Головна', 'Кейси', 'Кейс: ' + pick(cases)]),
+      referrer: src.source === 'direct' ? '' : 'https://' + (src.source === 'meta' ? 'l.facebook.com' : src.source + '.com') + '/',
+      landing: pick(['/', '/', '/cases', '/academy']),
+      casesViewed: seen.join(', '),
+      pagesViewed: String(pages),
+      timeOnSite: secs < 60 ? secs + ' с' : Math.floor(secs / 60) + ' хв ' + (secs % 60) + ' с',
+      visit: returning ? 'Повторний (2-й візит)' : 'Перший візит',
+      country: g[0], region: g[2], city: g[1],
+      device: pick(devices),
+      lang: g[0] === 'UA' ? 'uk-UA' : g[0] === 'PL' ? 'pl-PL' : 'de-DE',
+      tz: g[0] === 'UA' ? 'Europe/Kyiv' : g[0] === 'PL' ? 'Europe/Warsaw' : 'Europe/Berlin',
+      viewport: pick(['390x844', '412x915', '1440x900', '1920x1080', '375x812']),
+      ipHash: digits(10)
+    });
+  }
+  list.sort(function (a, b) { return a.createdAt < b.createdAt ? -1 : 1; });
+  return list;
 }
 
 /**
@@ -422,17 +592,7 @@ function writeLead_(lead) {
     var row = last + 1;
     if (row > MAX_ROWS + 1) throw new Error('Таблиця заповнена (' + MAX_ROWS + ' заявок). Перенесіть старі в архів.');
 
-    var created = lead.createdAt ? new Date(lead.createdAt) : new Date();
-    var values = COLUMNS.map(function (c) {
-      if (c.manual) return '';
-      if (c.key === 'status') return 'Новий';
-      if (c.key === 'createdAt') return created;
-      if (c.key === 'day') return Utilities.formatDate(created, TIMEZONE, 'yyyy-MM-dd');
-      if (c.key === 'month') return Utilities.formatDate(created, TIMEZONE, 'yyyy-MM');
-      if (c.key === 'week') return isoWeek_(created);
-      var v = lead[c.key];
-      return v === undefined || v === null ? '' : String(v);
-    });
+    var values = leadToRow_(lead);
     sheet.getRange(row, 1, 1, COLUMNS.length).setValues([values]);
 
     // клікабельні контакти й посилання
@@ -442,6 +602,21 @@ function writeLead_(lead) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/** Заявка → масив значень у порядку колонок COLUMNS (спільний для запису з сайту й демо-даних). */
+function leadToRow_(lead) {
+  var created = lead.createdAt ? new Date(lead.createdAt) : new Date();
+  return COLUMNS.map(function (c) {
+    if (c.manual) return '';
+    if (c.key === 'status') return lead.status || 'Новий';
+    if (c.key === 'createdAt') return created;
+    if (c.key === 'day') return Utilities.formatDate(created, TIMEZONE, 'yyyy-MM-dd');
+    if (c.key === 'month') return Utilities.formatDate(created, TIMEZONE, 'yyyy-MM');
+    if (c.key === 'week') return isoWeek_(created);
+    var v = lead[c.key];
+    return v === undefined || v === null ? '' : String(v);
+  });
 }
 
 /* ------------------------------------------------------------------ *

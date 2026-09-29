@@ -433,7 +433,7 @@ function seedDemoData() {
         var text = l[key] || '';
         var url = key === 'contact' ? contactUrl_(text) : siteUrl_(text);
         var b = SpreadsheetApp.newRichTextValue().setText(text);
-        if (url && text) b.setLinkUrl(url);
+        if (url && text) { try { b.setLinkUrl(url); } catch (e) { /* лишаємо текстом */ } }
         return [b.build()];
       });
       sheet.getRange(start, colIndex_(key), N, 1).setRichTextValues(rich);
@@ -595,9 +595,13 @@ function writeLead_(lead) {
     var values = leadToRow_(lead);
     sheet.getRange(row, 1, 1, COLUMNS.length).setValues([values]);
 
-    // клікабельні контакти й посилання
-    linkCell_(sheet, row, 'contact', contactUrl_(lead.contact));
-    linkCell_(sheet, row, 'link', siteUrl_(lead.link));
+    // клікабельні контакти й посилання — косметика: заявка вже записана, тому збій тут не має її «провалювати»
+    try {
+      linkCell_(sheet, row, 'contact', contactUrl_(lead.contact));
+      linkCell_(sheet, row, 'link', siteUrl_(lead.link));
+    } catch (linkErr) {
+      console.warn('Не вдалося зробити посилання: ' + linkErr);
+    }
     return { row: row, duplicate: false };
   } finally {
     lock.releaseLock();
@@ -659,18 +663,16 @@ function linkCell_(sheet, row, key, url) {
   cell.setRichTextValue(SpreadsheetApp.newRichTextValue().setText(text).setLinkUrl(url).build());
 }
 
-/** @nick → Telegram, номер → tel:. Незрозумілий формат — просто текст. */
+/**
+ * @nick або t.me/nick → посилання на Telegram. Номер телефону лишається звичайним текстом:
+ * Google Sheets не приймає посилань зі схемою tel: (setLinkUrl кидає помилку).
+ */
 function contactUrl_(raw) {
   var s = String(raw || '').trim();
   if (!s) return '';
   var tg = s.match(/^(?:https?:\/\/)?(?:t\.me|telegram\.me)\/([A-Za-z0-9_]{3,})/i);
   if (tg) return 'https://t.me/' + tg[1];
   if (/^@[A-Za-z0-9_]{3,}$/.test(s)) return 'https://t.me/' + s.slice(1);
-  var digits = s.replace(/[^\d]/g, '');
-  if (/^[+\d][\d\s().-]{8,}$/.test(s) && digits.length >= 10 && digits.length <= 15) {
-    if (digits.length === 10 && digits.charAt(0) === '0') digits = '38' + digits; // 0637194373 → +380637194373
-    return 'tel:+' + digits;
-  }
   return '';
 }
 

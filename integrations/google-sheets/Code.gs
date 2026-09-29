@@ -160,7 +160,7 @@ function setup() {
       .setRanges([statusRange]).build());
   });
   rules.push(SpreadsheetApp.newConditionalFormatRule()
-    .whenFormulaSatisfied('=OR($' + colLetter_('status') + '2="Відмова",$' + colLetter_('status') + '2="Спам")')
+    .whenFormulaSatisfied('=(($' + colLetter_('status') + '2="Відмова")+($' + colLetter_('status') + '2="Спам"))>0')
     .setFontColor('#9A9EAD').setRanges([body]).build());
   sheet.setConditionalFormatRules(rules);
 
@@ -253,6 +253,19 @@ function addTestLead() {
 
 var STATS_SHEET = 'Аналітика';
 
+/**
+ * Роздільник аргументів у формулах залежить від локалі таблиці: у США — кома, в Україні та більшості
+ * європейських локалей — крапка з комою. Визначаємо пробною формулою (надійніше за список локалей).
+ */
+function argSep_(sh) {
+  var probe = sh.getRange('A60');
+  probe.setFormula('=IF(TRUE,1,2)');
+  SpreadsheetApp.flush();
+  var ok = probe.getValue() === 1;
+  probe.clear();
+  return ok ? ',' : ';';
+}
+
 function buildStats_(ss) {
   var sh = ss.getSheetByName(STATS_SHEET) || ss.insertSheet(STATS_SHEET);
   sh.clear();
@@ -261,32 +274,36 @@ function buildStats_(ss) {
   sh.getRange(1, 1, 60, 13).setFontFamily('Nunito').setFontSize(10).setFontColor(INK).setVerticalAlignment('middle');
   [190, 90, 90, 40, 190, 90, 90, 40, 190, 90, 90].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
 
+  // у формулах аргументи розділяємо знаком «¦» — fx() замінює його на роздільник локалі таблиці
+  var SEP = argSep_(sh);
+  var fx = function (f) { return f.split('¦').join(SEP); };
+
   var L = "'" + SHEET_NAME + "'!";
   var lastCol = colLetter_(COLUMNS[COLUMNS.length - 1].key);
   var data = L + '$A$1:$' + lastCol + '$' + (MAX_ROWS + 1);
   var rng = function (key) { return L + '$' + colLetter_(key) + '$2:$' + colLetter_(key) + '$' + (MAX_ROWS + 1); };
-  var created = rng('createdAt'), status = rng('status'), day = rng('day'), visit = rng('visit');
+  var created = rng('createdAt'), status = rng('status'), visit = rng('visit');
 
   sh.getRange('A1').setValue('Заявки marketingpro — зведення').setFontSize(16).setFontWeight('bold');
   sh.getRange('A2').setValue('Рахується автоматично з аркуша «' + SHEET_NAME + '». Нічого тут не редагуйте.').setFontColor(TECH);
 
-  // Ключові цифри — плитки по 4 в ряд (колонки A, E, I…)
+  // Ключові цифри — плитки по 3 в ряд (колонки A, E, I)
   var kpi = [
     ['Усього заявок', '=COUNTA(' + created + ')'],
-    ['Нових (без обробки)', '=COUNTIF(' + status + ',"Новий")'],
-    ['Сьогодні', '=COUNTIF(' + day + ',TEXT(TODAY(),"yyyy-mm-dd"))'],
-    ['За 7 днів', '=COUNTIFS(' + created + ',">="&(NOW()-7))'],
-    ['За 30 днів', '=COUNTIFS(' + created + ',">="&(NOW()-30))'],
-    ['Стали клієнтами', '=COUNTIF(' + status + ',"Клієнт")'],
-    ['Конверсія (без спаму)', '=IFERROR(COUNTIF(' + status + ',"Клієнт")/(COUNTA(' + created + ')-COUNTIF(' + status + ',"Спам")),0)'],
-    ['Повторні візити', '=COUNTIF(' + visit + ',"Повторний*")']
+    ['Нових (без обробки)', '=COUNTIF(' + status + '¦"Новий")'],
+    ['Сьогодні', '=COUNTIF(' + created + '¦">="&TODAY())'],
+    ['За 7 днів', '=COUNTIF(' + created + '¦">="&(TODAY()-6))'],
+    ['За 30 днів', '=COUNTIF(' + created + '¦">="&(TODAY()-29))'],
+    ['Стали клієнтами', '=COUNTIF(' + status + '¦"Клієнт")'],
+    ['Конверсія (без спаму)', '=IFERROR(COUNTIF(' + status + '¦"Клієнт")/(COUNTA(' + created + ')-COUNTIF(' + status + '¦"Спам"))¦0)'],
+    ['Повторні візити', '=COUNTIF(' + visit + '¦"Повторний*")']
   ];
   var tileCols = [1, 5, 9];
   kpi.forEach(function (t, i) {
     var r = 4 + Math.floor(i / 3) * 3, c = tileCols[i % 3];
     sh.getRange(r, c, 2, 3).setBackground('#F6F7FA');
     sh.getRange(r, c).setValue(t[0]).setFontColor(TECH).setFontSize(9);
-    var v = sh.getRange(r + 1, c).setFormula(t[1]).setFontSize(20).setFontWeight('bold').setHorizontalAlignment('left');
+    var v = sh.getRange(r + 1, c).setFormula(fx(t[1])).setFontSize(20).setFontWeight('bold').setHorizontalAlignment('left');
     if (t[0].indexOf('Конверсія') === 0) v.setNumberFormat('0.0%');
   });
 
@@ -304,10 +321,11 @@ function buildStats_(ss) {
     var k = colLetter_(b.key);
     sh.getRange(b.row, b.col).setValue(b.title).setFontWeight('bold').setFontSize(12);
 
-    var q = b.days
-      ? 'select ' + k + ', count(' + idL + ') where ' + k + " is not null and " + k + " <> '' group by " + k + ' order by ' + k + ' desc limit 14 label ' + k + " '" + b.label + "', count(" + idL + ") 'Заявок'"
-      : 'select ' + k + ', count(' + idL + ') where ' + k + " is not null and " + k + " <> '' group by " + k + ' order by count(' + idL + ') desc limit 14 label ' + k + " '" + b.label + "', count(" + idL + ") 'Заявок'";
-    sh.getRange(b.row + 1, b.col).setFormula('=IFERROR(QUERY(' + data + ',"' + q + '",1),"Поки немає даних")');
+    // рядок запиту QUERY — окрема мова: коми в ньому лишаються комами за будь-якої локалі
+    var order = b.days ? k + ' desc' : 'count(' + idL + ') desc';
+    var q = 'select ' + k + ', count(' + idL + ') where ' + k + " is not null and " + k + " <> '' group by " + k +
+      ' order by ' + order + ' limit 14 label ' + k + " '" + b.label + "', count(" + idL + ") 'Заявок'";
+    sh.getRange(b.row + 1, b.col).setFormula(fx('=IFERROR(QUERY(' + data + '¦"' + q + '"¦1)¦"Поки немає даних")'));
 
     var head = sh.getRange(b.row + 1, b.col, 1, b.days ? 2 : 3);
     head.setFontWeight('bold').setFontColor('#FFFFFF').setBackground(INK);
@@ -316,7 +334,7 @@ function buildStats_(ss) {
       var f = [];
       for (var i = 0; i < 14; i++) {
         var a1 = sh.getRange(b.row + 2 + i, b.col).getA1Notation();
-        f.push(['=IF(' + a1 + '="","",COUNTIFS(' + rng(b.key) + ',' + a1 + ',' + status + ',"Клієнт"))']);
+        f.push([fx('=IF(' + a1 + '=""¦""¦COUNTIFS(' + rng(b.key) + '¦' + a1 + '¦' + status + '¦"Клієнт"))')]);
       }
       sh.getRange(b.row + 2, b.col + 2, 14, 1).setFormulas(f);
     }

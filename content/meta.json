@@ -1,0 +1,420 @@
+{
+  "pages": {
+    "home": {
+      "title": "marketingpro — таргетована реклама в Meta Ads, що рахує ваші гроші",
+      "description": "Агенція таргетованої реклами. Купуємо лідів у Meta Ads дешевше за конкурентів: будуємо воронки, які приносять підтверджені продажі, а не лайки й охоплення. Безкоштовний аудит рекламного кабінету.",
+      "canonical": "https://marketingpro.company/",
+      "ogImage": "https://marketingpro.company/assets/og-image.jpg",
+      "ogType": "website",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "ProfessionalService",
+          "name": "marketingpro — агенція таргетованої реклами",
+          "description": "Performance-маркетинг у Meta Ads: воронки, що приносять підтверджені продажі.",
+          "areaServed": "UA",
+          "founder": {
+            "@type": "Person",
+            "name": "Світлана Ліщишина"
+          },
+          "knowsAbout": [
+            "Meta Ads",
+            "Performance-маркетинг",
+            "Таргетована реклама",
+            "ROAS"
+          ]
+        }
+      ]
+    },
+    "academy": {
+      "title": "Академія таргетованої реклами — marketingpro | навчання Meta Ads на кейсах",
+      "description": "Навчання таргетованій рекламі в Meta Ads на реальних кейсах. Два напрями: для власників бізнесу (5 тижнів) і для тих, хто будує карʼєру таргетолога (10 тижнів).",
+      "canonical": "https://marketingpro.company/academy",
+      "ogImage": "https://marketingpro.company/assets/og-image.jpg",
+      "ogType": "website",
+      "ld": []
+    },
+    "cases-index": {
+      "title": "Кейси — marketingpro | результати таргетованої реклами в Meta Ads",
+      "description": "Кейси агенції marketingpro: реальні цифри з рекламних кабінетів — меблі, одяг, школа мов, e-commerce, стоматологія, бьюті, фітнес. ROAS, вартість клієнта, дохід.",
+      "canonical": "https://marketingpro.company/cases",
+      "ogImage": "https://marketingpro.company/assets/og-image.jpg",
+      "ogType": "website",
+      "ld": []
+    }
+  },
+  "cases": [
+    {
+      "slug": "apparel",
+      "title": "Український бренд одягу з власним виробництвом — кейс marketingpro",
+      "description": "Дохід з реклами виріс удесятеро за рік роботи. ×10 дохід · 8,75$ клієнт · 1182% roas",
+      "canonical": "https://marketingpro.company/cases/apparel",
+      "ogImage": "https://marketingpro.company/assets/img/cases/apparel/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Український бренд одягу з власним виробництвом"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 02 · таргетована реклама",
+      "prev": {
+        "slug": "furniture",
+        "name": "Виробництво меблів"
+      },
+      "next": {
+        "slug": "language",
+        "name": "Школа іноземних мов"
+      }
+    },
+    {
+      "slug": "bags",
+      "title": "Онлайн-магазин жіночих сумок — кейс marketingpro",
+      "description": "Дохід з реклами ×7 за дев'ять місяців після невдалих запусків. 961% roas · 8,38$ клієнт · 30 961$ дохід/міс",
+      "canonical": "https://marketingpro.company/cases/bags",
+      "ogImage": "https://marketingpro.company/assets/img/cases/bags/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Онлайн-магазин жіночих сумок"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 04 · таргетована реклама",
+      "prev": {
+        "slug": "language",
+        "name": "Школа іноземних мов"
+      },
+      "next": {
+        "slug": "flowers",
+        "name": "Мережа магазинів квітів"
+      }
+    },
+    {
+      "slug": "beauty",
+      "title": "Студія краси повного циклу — кейс marketingpro",
+      "description": "Графік майстрів заповнений без «порожніх» днів. 829% roas · 8,2$ клієнт · 9 650$ дохід/міс",
+      "canonical": "https://marketingpro.company/cases/beauty",
+      "ogImage": "https://marketingpro.company/assets/img/cases/beauty/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Студія краси повного циклу"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 07 · таргетована реклама",
+      "prev": {
+        "slug": "dental",
+        "name": "Стоматологічна клініка"
+      },
+      "next": {
+        "slug": "gym",
+        "name": "Запуск спортзалу з нуля"
+      }
+    },
+    {
+      "slug": "dental",
+      "title": "Стоматологічна клініка — кейс marketingpro",
+      "description": "За два місяці дохід клініки з реклами зріс утричі. ×3 дохід · 27,5$ пацієнт · 869% roas",
+      "canonical": "https://marketingpro.company/cases/dental",
+      "ogImage": "https://marketingpro.company/assets/img/cases/dental/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Стоматологічна клініка"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 06 · таргетована реклама",
+      "prev": {
+        "slug": "flowers",
+        "name": "Мережа магазинів квітів"
+      },
+      "next": {
+        "slug": "beauty",
+        "name": "Студія краси повного циклу"
+      }
+    },
+    {
+      "slug": "flowers",
+      "title": "Мережа магазинів квітів — кейс marketingproКвітень — 8,47$Травень — 5,92$Червень — 3,59$Липень — 2,17$Серпень — 2,84$Вересень — 3,14$Жовтень — 1,98$Листопад — 2,36$Грудень — 1,93$Квітень — 25,38$Травень — 18,91$Червень — 12,67$Липень — 7,82$Серпень — 9,41$Вересень — 5,97$Жовтень — 7,63$Листопад — 6,48$Грудень — 4,56$",
+      "description": "Вартість клієнта впала в шість разів — відкрили ще два магазини. 4,28$ клієнт · 1,5$ переписка · +2 магазини",
+      "canonical": "https://marketingpro.company/cases/flowers",
+      "ogImage": "https://marketingpro.company/assets/img/cases/flowers/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Мережа магазинів квітів"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 05 · маркетинг під ключ",
+      "prev": {
+        "slug": "bags",
+        "name": "Онлайн-магазин жіночих сумок"
+      },
+      "next": {
+        "slug": "dental",
+        "name": "Стоматологічна клініка"
+      }
+    },
+    {
+      "slug": "furniture",
+      "title": "Виробництво меблів — кейс marketingpro",
+      "description": "167 продажів на місяць і окремий потік B2B-замовлень від дизайнерів. 2584% roas · 29$ клієнт · 125 250$ дохід/міс",
+      "canonical": "https://marketingpro.company/cases/furniture",
+      "ogImage": "https://marketingpro.company/assets/img/cases/furniture/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Виробництво меблів"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 01 · таргетована реклама",
+      "prev": null,
+      "next": {
+        "slug": "apparel",
+        "name": "Український бренд одягу з власним виробництвом"
+      }
+    },
+    {
+      "slug": "gym",
+      "title": "Запуск спортзалу з нуля — кейс marketingpro",
+      "description": "Новий спортзал вийшов на ринок з готовою маркетинговою системою. 837% roas · 10,4$ клієнт · 79 клієнтів/міс",
+      "canonical": "https://marketingpro.company/cases/gym",
+      "ogImage": "https://marketingpro.company/assets/img/cases/gym/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Запуск спортзалу з нуля"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 08 · маркетинг під ключ",
+      "prev": {
+        "slug": "beauty",
+        "name": "Студія краси повного циклу"
+      },
+      "next": {
+        "slug": "keratin",
+        "name": "Майстер кератину"
+      }
+    },
+    {
+      "slug": "keratin",
+      "title": "Майстер кератину — кейс marketingpro",
+      "description": "Стабільний потік записів замість нерегулярних заявок. 929% roas · 7,4$ клієнт · 50 клієнтів/міс",
+      "canonical": "https://marketingpro.company/cases/keratin",
+      "ogImage": "https://marketingpro.company/assets/img/cases/keratin/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Майстер кератину"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 09 · таргетована реклама",
+      "prev": {
+        "slug": "gym",
+        "name": "Запуск спортзалу з нуля"
+      },
+      "next": null
+    },
+    {
+      "slug": "language",
+      "title": "Школа іноземних мов — кейс marketingpro",
+      "description": "137 нових учнів на місяць — групи заповнюються рівномірно. 1168% roas · 14,2$ учень · 137 учнів/міс",
+      "canonical": "https://marketingpro.company/cases/language",
+      "ogImage": "https://marketingpro.company/assets/img/cases/language/cover.jpg",
+      "ogType": "article",
+      "ld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://marketingpro.company/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Кейси",
+              "item": "https://marketingpro.company/cases"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Школа іноземних мов"
+            }
+          ]
+        }
+      ],
+      "label": "кейс 03 · таргетована реклама",
+      "prev": {
+        "slug": "apparel",
+        "name": "Український бренд одягу з власним виробництвом"
+      },
+      "next": {
+        "slug": "bags",
+        "name": "Онлайн-магазин жіночих сумок"
+      }
+    }
+  ]
+}

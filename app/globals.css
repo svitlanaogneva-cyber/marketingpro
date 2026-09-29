@@ -1,0 +1,1311 @@
+/* =================================================================
+   marketingpro — агенція таргетованої реклами
+   Напрям: світлий analytical-editorial. 2 базові + 1 сигнал.
+   Unbounded (display) · Nunito Sans (все інше).
+   ================================================================= */
+
+/* =================================================================
+   ПРАВИЛА — кожне значення на сайті береться звідси.
+   Колір, кегль, накреслення, трекінг і інтерліньяж не пишуться числом
+   у правилах нижче: тільки токен. Виняток — підписи всередині SVG-графіків,
+   там px — це одиниці viewBox, а не екрана.
+
+   КОЛІР
+     світле тло:  --paper (сторінка) · --surface (картки) · --white (плити з тінню)
+     темне тло:   --ink
+     текст на світлому: --tx (заголовки) · --tx-soft (абзаци) · --tx-mute (підписи)
+     текст на темному:  --inv · --inv-soft · --inv-mute
+     акцент: --signal — один рожевий на все: посилання, мітки, цифри, кнопка
+
+   ШРИФТ
+     --f-display (Unbounded) — заголовки, назви, цифри
+     --f-body (Nunito Sans)  — усе інше
+
+   РОЛІ ТЕКСТУ                  кегль           накреслення   трекінг
+     заголовок сторінки/секції  --fs-h1/h2      800           --ls-display / --ls-heading
+     назва картки/розділу       --fs-h3…h5      600           --ls-title
+     довгий дисплейний текст    --fs-quote/h5   500           --ls-title
+     цифра-акцент               --fs-num/stat   800           --ls-display
+     абзац                      --fs-body       500           0
+     текст у картці             --fs-small      500           0
+     кнопка, лінк, поле         --fs-ui         600           --ls-meta
+     підпис                     --fs-meta       500–600       --ls-meta
+     КАПІТЕЛЬ-мітка (рожева)    --fs-caps       700           --ls-caps
+     КАПІТЕЛЬ-підпис (сіра)     --fs-caps       600           --ls-caps
+   ================================================================= */
+
+:root {
+  /* ---- колір: 2 базові + 1 сигнал ---- */
+  --paper:   #FDFCFC;       /* тло сторінки — майже білий, без крему/жовтизни */
+  --surface: #F5F3F1;       /* картки на світлому */
+  --white:   #FFFFFF;       /* плити з тінню над сторінкою й текст на фото */
+  --inv-base: #F1F1EE;      /* база інверсних токенів — світле на темному */
+  --ink:     #18181A;       /* нейтральна туш, без брунатності */
+  --signal:  #FF2D7E;       /* рожевий з лого — один на весь сайт */
+
+  /* похідні — сірий задає колір, а не opacity: інакше кожен блок мав свою
+     прозорість і на сайті жило з десяток різних сірих */
+  --tx:        var(--ink);
+  --tx-soft:   color-mix(in srgb, var(--ink) 74%, var(--paper));
+  --tx-mute:   color-mix(in srgb, var(--ink) 55%, var(--paper));
+  --line:      color-mix(in srgb, var(--ink) 14%, transparent);
+  --line-2:    color-mix(in srgb, var(--ink) 26%, transparent);
+
+  --inv:       var(--inv-base);
+  --inv-soft:  color-mix(in srgb, var(--inv-base) 80%, var(--ink));
+  --inv-mute:  color-mix(in srgb, var(--inv-base) 50%, var(--ink));
+  --inv-line:  color-mix(in srgb, var(--inv-base) 16%, transparent);
+
+  /* рівно 3 радіуси */
+  --r-hair: 2px;
+  --r-card: 12px;
+  --r-cta:  100px;
+
+  /* ---- шрифти ---- */
+  --f-display: var(--font-unbounded), "Unbounded", system-ui, sans-serif;
+  --f-body:    var(--font-nunito), "Nunito Sans", system-ui, sans-serif;
+
+  /* ---- кеглі ---- */
+  --fs-h1:    clamp(2.3rem, 5.2vw, 4.6rem);   /* заголовок сторінки */
+  --fs-h2:    clamp(1.9rem, 4.4vw, 3.4rem);   /* заголовок секції */
+  --fs-quote: clamp(1.6rem, 3.3vw, 2.75rem);  /* велика цитата */
+  --fs-h3:    clamp(1.5rem, 2.6vw, 2.2rem);   /* заголовок великого блоку */
+  --fs-h4:    clamp(1.2rem, 1.8vw, 1.5rem);   /* заголовок картки / розділу кейсу */
+  --fs-h5:    clamp(1.05rem, 1.4vw, 1.2rem);  /* дрібний заголовок, питання FAQ */
+  --fs-num:   clamp(2.4rem, 4.2vw, 3.6rem);   /* велика цифра-акцент */
+  --fs-stat:  clamp(1.1rem, 1.8vw, 1.6rem);   /* цифра в ряду показників */
+  --fs-lead:  clamp(1.1rem, 1.5vw, 1.25rem);  /* лід під головним заголовком */
+  --fs-body:  18px;                           /* абзаци */
+  --fs-small: 16px;                           /* текст у картках і списках */
+  --fs-ui:    15px;                           /* кнопки, посилання, поля */
+  --fs-meta:  13px;                           /* підписи, дати, навігація */
+  --fs-caps:  12px;                           /* підписи капітеллю */
+  --fs-logo:  18px;                           /* лого в шапці */
+
+  /* ---- накреслення: чотири, не пʼять ---- */
+  --fw-text:  500;   /* абзаци, довгий дисплейний текст */
+  --fw-ui:    600;   /* кнопки, лінки, назви карток, сірі капітелі */
+  --fw-bold:  700;   /* рожеві капітелі-мітки, виділене в підписах */
+  --fw-heavy: 800;   /* заголовки секцій і цифри */
+
+  /* ---- трекінг ---- */
+  --ls-display: -0.04em;  /* h1 і великі цифри */
+  --ls-heading: -0.03em;  /* h2 */
+  --ls-title:   -0.02em;  /* назви карток, цитата, питання */
+  --ls-meta:     0.02em;  /* кнопки, підписи */
+  --ls-caps:     0.08em;  /* капітель */
+
+  /* ---- інтерліньяж ---- */
+  --lh-num:     0.9;    /* великі цифри */
+  --lh-heading: 1.08;   /* заголовки — кирилиця з виносними не злипається */
+  --lh-title:   1.15;   /* назви карток, цитата */
+  --lh-compact: 1.45;   /* підписи, короткі рядки */
+  --lh-body:    1.6;    /* абзаци */
+
+  --maxw: 1280px;
+  --gutter: clamp(20px, 5vw, 72px);
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  /* різке на старті, довге на виході — рух читається як «доїхало», а не «доповзло» */
+  --ease-expo: cubic-bezier(.19, 1, .22, 1);
+
+  /* висота трьома шарами: контурний, контактний, розсіяний.
+     один розмитий shadow дає брудну пляму, три — відчуття аркуша над сторінкою */
+  --shadow-card:  0 0 0 1px color-mix(in srgb, var(--ink) 4.5%, transparent), 0 2px 4px color-mix(in srgb, var(--ink) 4.5%, transparent), 0 12px 24px color-mix(in srgb, var(--ink) 5%, transparent);
+  --shadow-lift:  0 0 0 1px color-mix(in srgb, var(--ink) 6%, transparent), 0 6px 12px color-mix(in srgb, var(--ink) 6%, transparent), 0 22px 44px color-mix(in srgb, var(--ink) 9%, transparent);
+  --shadow-float: 0 5px 18px color-mix(in srgb, var(--ink) 20%, transparent);
+  --flare: 0 0 0 4px color-mix(in srgb, var(--signal) 18%, transparent);
+}
+/* на вузькому екрані h1 зменшується весь, а не кожен заголовок окремим правилом:
+   довгі слова («Стоматологічна», «Допомагаємо») мусять влазити в рядок */
+@media (max-width: 560px) { :root { --fs-h1: clamp(1.6rem, 8vw, 2.3rem); } }
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--paper); overscroll-behavior: none; }
+body { overscroll-behavior: none; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  font-family: var(--f-body);
+  background: var(--paper);
+  color: var(--tx);
+  font-size: var(--fs-body); line-height: var(--lh-body); font-weight: var(--fw-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; cursor: pointer; background: none; border: none; }
+ul { list-style: none; padding: 0; }
+::selection { background: var(--signal); color: var(--white); }
+
+/* ---- type ---- */
+/* 1.0 тисне рядки в українських заголовках — кирилиця вища за латиницю,
+   а виносні (р, у, ц, щ) чіпляють наступний рядок. 1.08 лишає той самий характер */
+h1, h2, h3 { font-family: var(--f-display); font-weight: var(--fw-heavy); line-height: var(--lh-heading); letter-spacing: var(--ls-heading); text-wrap: balance; }
+p { text-wrap: pretty; }
+.display { font-size: var(--fs-h1); line-height: var(--lh-heading); letter-spacing: var(--ls-display); }
+/* Unbounded широкий і з тісним трекінгом, тож звичайний пробіл у ньому
+   здається діркою — підтискаємо саме проміжок між словами */
+.display--tight { word-spacing: -.08em; }
+.h2 { font-size: var(--fs-h2); line-height: var(--lh-heading); letter-spacing: var(--ls-heading); }
+.lead { font-size: var(--fs-lead); color: var(--tx-soft); line-height: var(--lh-compact); font-weight: var(--fw-text); }
+
+/* Надзаголовок секції. Був «пігулкою» на кольоровій плашці — і читався як
+   кнопка, хоча нічого не робить. Тепер це косі рисочки + капітель: маркер
+   розділу, а не елемент керування. Стиль один на всі секції обох тем */
+.label {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-caps); text-transform: uppercase;
+  color: var(--signal); background: none; padding: 0; border-radius: 0;
+}
+/* рисочки «//» прибрано: прийом із коду нічого не каже клієнтам агенції */
+.label--inv { color: var(--signal); background: none; }
+
+/* хлібні крихти в шапці підсторінок — навігація, а не маркер розділу */
+.hero-top .label { gap: 0; font-size: var(--fs-meta); font-weight: var(--fw-ui); letter-spacing: var(--ls-meta); text-transform: none; color: var(--tx-mute); }
+.hero-top .label::before { content: none; }
+.hero-top .label a:hover { color: var(--signal); }
+
+/* перелік напрямів у герої — рядок через крапку, а не розсип чипів */
+.label-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0; margin-bottom: 26px; }
+.hero .label-group .label { font-size: var(--fs-caps); font-weight: var(--fw-ui); letter-spacing: var(--ls-caps); color: var(--tx-mute); }
+.hero .label-group .label::before { content: none; }
+.hero .label-group .label + .label::before { content: "·"; display: inline-block; width: auto; height: auto; margin: 0 11px; background: none; color: var(--signal); opacity: 1; font-weight: var(--fw-bold); transform: scale(1.6); }
+
+/* позначка ПІСЛЯ заголовка — не маркер розділу, а лічильник («2 програми»),
+   тож рисочок не отримує і тримається тихо */
+.svc-head .h2 + .label { color: var(--tx-mute); letter-spacing: var(--ls-caps); }
+.svc-head .h2 + .label::before { content: none; }
+
+.sig { color: var(--signal); }
+
+/* ---- layout ---- */
+.wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-block: clamp(74px, 11vw, 152px); }
+
+/* ---- buttons ---- */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 11px 20px; border-radius: var(--r-cta);
+  font-family: var(--f-body); font-size: var(--fs-ui); font-weight: var(--fw-ui); letter-spacing: var(--ls-meta);
+  border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+  transition: background .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease);
+}
+.btn .arr { transition: transform .3s var(--ease); }
+/* легке натискання — кнопка відповідає на дотик, особливо на телефоні */
+.btn:active { transform: scale(.98); }
+.btn { transition: background .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease), transform .12s var(--ease); }
+.btn:hover .arr { transform: translateX(5px); }
+.btn--signal { background: var(--signal); border-color: var(--signal); color: var(--white); font-weight: var(--fw-ui); }
+/* ореол замість підняття: кнопка лишається на місці, але набирає ваги */
+.btn--signal:hover { background: var(--signal); border-color: var(--signal); box-shadow: var(--flare); }
+/* другорядна дія — рожевий контур без заливки; на наведенні рожевий серпанок.
+   Одна на весь сайт: раніше була сірою напівпрозорою, а в кейсах і академії
+   її перефарбовували окремими правилами */
+.btn--ghost { background: transparent; color: var(--signal); border-color: var(--signal); }
+.btn--ghost:hover { background: color-mix(in srgb, var(--signal) 10%, transparent); }
+.btn--lg { padding: 13px 26px; font-size: var(--fs-small); }
+:focus-visible { outline: 2.5px solid var(--signal); outline-offset: 3px; border-radius: var(--r-hair); }
+.btn--signal:focus-visible { box-shadow: var(--flare); }
+
+/* media — grayscale, оживає на hover (стан, не декор) */
+.media { position: relative; overflow: hidden; background: var(--ink); }
+.media img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.04); opacity: .9; transition: filter .5s var(--ease), opacity .5s var(--ease); }
+.media:hover img { filter: grayscale(0) contrast(1); opacity: 1; }
+.media .cap { position: absolute; left: 14px; bottom: 12px; font-family: var(--f-body); font-size: var(--fs-caps); letter-spacing: var(--ls-caps); color: var(--inv); text-transform: uppercase; z-index: 2; font-weight: var(--fw-ui); }
+.media .cap::before { content: "▸ "; color: var(--signal); }
+
+/* =================================================================
+   HEADER
+   ================================================================= */
+/* шапка непрозора: крізь напівпрозоре тло під час скролу просвічували
+   заголовки й картки, і смуга меню читалася брудно */
+.site-header { position: sticky; top: 0; z-index: 100; background: var(--paper); border-bottom: 1px solid transparent; transition: background .18s var(--ease), border-color .18s var(--ease); }
+.site-header.is-stuck { border-bottom-color: var(--line); }
+/* над темними секціями шапка сама темніє — інакше світла плита розрізала б
+   чорний блок навпіл. Клас вішає скрипт за секцією під нижнім краєм шапки */
+.site-header.is-dark { background: var(--ink); }
+.site-header.is-dark.is-stuck { background: var(--ink); border-bottom-color: transparent; }
+.site-header.is-dark .nav-links a { color: var(--inv); }
+/* Академія лишається рожевою і на темній шапці */
+.site-header.is-dark .nav-links a[href$="academy.html"] { color: var(--signal); }
+.site-header.is-dark .nav-links a:not(.btn):not([href$="academy.html"]):hover,
+.site-header.is-dark .nav-links a:not(.btn):not([href$="academy.html"])[aria-current="page"] { color: var(--inv); }
+.site-header.is-dark .nav-toggle span, .site-header.is-dark .nav-toggle span::before, .site-header.is-dark .nav-toggle span::after { background: var(--inv); }
+.nav { display: flex; align-items: center; justify-content: space-between; height: 70px; gap: 24px; }
+/* лого двоколірне: «marketing» тушшю, «pro» сигналом — сигнал лишається акцентом, а не всім словом */
+/* колір лого й бургера мусить перемикатися разом із тлом шапки,
+   інакше на переході чорне лого встигає блимнути на чорному */
+.brand { font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-logo); letter-spacing: var(--ls-display); color: var(--tx); transition: color .18s var(--ease); }
+.brand-pro { color: var(--signal); }
+.site-header.is-dark .brand { color: var(--inv); }
+.nav-links { display: flex; gap: 2px; }
+.nav-links a { font-family: var(--f-body); font-size: var(--fs-small); padding: 8px 13px; border-radius: var(--r-cta); color: var(--tx-soft); transition: color .18s var(--ease); }
+/* Академія — єдиний кольоровий пункт меню: рожевим завжди, з будь-якої
+   сторінки й незалежно від наведення. Решта розділів кольору не беруть */
+.nav-links a[href$="academy.html"] { color: var(--signal); }
+/* активний і наведений розділ — просто повна туш замість приглушеної,
+   без риски й без кольору: колір у меню лишається тільки в Академії */
+.nav-links a:not(.btn):not([href$="academy.html"]):hover,
+.nav-links a:not(.btn):not([href$="academy.html"])[aria-current="page"] { color: var(--tx); }
+.nav-actions { display: flex; align-items: center; gap: 12px; }
+/* CTA і контакти живуть тільки в мобільному меню — на десктопі їх немає */
+.nav-cta, .nav-contacts { display: none; }
+.nav-actions a.btn { transition: background .25s, border-color .25s; }
+.nav-toggle { display: none; width: 44px; height: 44px; border-radius: var(--r-card); align-items: center; justify-content: center; }
+.nav-toggle span, .nav-toggle span::before, .nav-toggle span::after { content: ""; display: block; width: 22px; height: 2px; background: var(--ink); transition: transform .3s var(--ease), opacity .2s, background .18s var(--ease); }
+.nav-toggle span::before { transform: translateY(-7px); }
+.nav-toggle span::after { transform: translateY(5px); }
+body.menu-open { overflow: hidden; }
+body.menu-open .site-header.is-dark { background: var(--paper); }
+body.menu-open .site-header.is-dark .brand { color: var(--tx); }
+body.menu-open .site-header.is-dark .nav-toggle span::before,
+body.menu-open .site-header.is-dark .nav-toggle span::after { background: var(--ink); }
+body.menu-open .nav-toggle span { background: transparent; }
+body.menu-open .nav-toggle span::before { transform: rotate(45deg); }
+body.menu-open .nav-toggle span::after { transform: rotate(-45deg); }
+
+/* =================================================================
+   HERO — редакторський розворот, асиметрія
+   ================================================================= */
+.hero { padding-top: clamp(40px, 6vw, 76px); padding-bottom: clamp(48px, 6vw, 90px); }
+
+.hero-top { position: relative; z-index: 1; display: grid; grid-template-columns: 1.35fr 0.65fr; gap: clamp(28px, 5vw, 72px); align-items: start; }
+.hero .label { display: inline-flex; }
+.hero .label-group { margin-bottom: 26px; }
+.hero h1 { margin-bottom: 0; }
+.hero h1 .ln2 { color: var(--signal); }
+.hero-right { display: flex; flex-direction: column; gap: 26px; padding-top: 58px; }
+.hero-right .lead { max-width: 38ch; }
+/* герой академії: абзац починається з тієї ж лінії, що й заголовок, а не
+   з відбивкою вниз. Кегль на щабель менший — поруч із «Академія таргету»
+   звичайний lead тягнув на себе увагу нарівні із заголовком */
+.hero-right--flush { padding-top: 0; }
+.hero-right--flush .lead { font-size: var(--fs-lead); }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-left: -20px; }
+
+/* ---- герой-картка (головна) ----
+   темний блок зі скругленням лежить на світлій сторінці окремим об'єктом.
+   На інших сторінках .hero сам є .wrap, тому все тримаємо в модифікаторі */
+.hero--card { padding-top: clamp(14px, 2.2vw, 26px); padding-bottom: clamp(34px, 4vw, 52px); }
+.hero-card {
+  position: relative; overflow: hidden; text-align: center;
+  display: flex; flex-direction: column;
+  /* картка тримає висоту екрана: блок відкриває сторінку, і замало повітря
+     робило його схожим на банер, а не на перший розворот */
+  min-height: min(78vh, 780px);
+  margin-inline: clamp(14px, 2.2vw, 26px); border-radius: 28px;
+  background: var(--ink); color: var(--inv);
+  padding: clamp(30px, 3.4vw, 48px) clamp(18px, 5vw, 72px) clamp(40px, 4vw, 56px);
+}
+/* перелік напрямів стоїть окремо вгорі картки, а не в центрованому блоці:
+   інакше він їхав до середини разом із заголовком */
+/* по центру, як і решта картки: притиснутий уліво перелік ламав симетрію */
+.hero--card .label-group { position: relative; margin-bottom: 0; justify-content: center; }
+/* решта тексту забирає всю вільну висоту й центрується в ній.
+   padding зверху зміщує цей центр трохи нижче геометричної середини */
+.hero-card-in { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-top: clamp(18px, 2.6vw, 42px); }
+/* фото-підкладка картки: лежить під світінням, приглушена лише прозорістю.
+   Розмиття прибрано — знімок різкий, промені мають лишитися променями */
+.hero-photo { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.hero-photo img {
+  width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%;
+  opacity: .62; filter: grayscale(.2);
+}
+/* чорна напівпрозора вуаль над фото: тримає контраст заголовка,
+   при цьому фото можна лишити насиченішим, ніж коли його гасили прозорістю */
+.hero-photo::after { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--ink) 62%, transparent); }
+.hero-card > *:not(.hero-photo) { position: relative; }
+.hero--card h1 { font-size: var(--fs-h1); max-width: 17ch; margin-inline: auto; }
+.hero--card .lead { margin: 20px auto 0; max-width: 50ch; color: var(--white); font-size: var(--fs-lead); }
+.hero--card .hero-cta { margin: 34px 0 0; justify-content: center; }
+/* на темному тлі темні токени тексту зникають — перекриваємо світлими */
+/* без капітелі: у картці це підпис-перелік напрямів, а не маркер розділу.
+   Усе білим на повну: приглушення робило текст сірим на строкатому фото */
+.hero--card .label-group .label { color: var(--white); opacity: 1; text-transform: none; letter-spacing: var(--ls-caps); }
+.hero--card .btn--ghost { color: var(--white); border-color: var(--white); }
+.hero--card .btn--ghost:hover { background: color-mix(in srgb, var(--white) 12%, transparent); }
+
+/* =================================================================
+   PAIN — нумерована editorial-марґіналія, без іконок
+   ================================================================= */
+.pain { background: var(--ink); color: var(--inv); }
+/* flex, а не block: інакше gap між рисочками й текстом не працює */
+.pain .label--inv { display: flex; margin-bottom: 30px; }
+.pain h2 { color: var(--inv); margin-bottom: clamp(40px, 6vw, 72px); max-width: 18ch; }
+/* три симптоми — картки, а не рядки під лінійками: кожен пункт самостійний,
+   і в списку вони читалися як продовження один одного */
+.pain-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 1.6vw, 20px); }
+/* без рамки: картку тримає ледь помітна заливка, обводка додавала зайвий шум */
+.pain-row {
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: clamp(26px, 2.8vw, 40px);
+  background: color-mix(in srgb, var(--inv-base) 5%, transparent);
+  border-radius: 28px;
+  transition: background .3s var(--ease-expo);
+}
+.pain-row:hover { background: color-mix(in srgb, var(--inv-base) 9%, transparent); }
+/* номер — не марґіналія, а «шапка» картки: велика цифра зверху, під нею
+   повітря, далі заголовок і текст. Так пункт читається згори вниз одним рухом */
+.pain-row .no {
+  font-family: var(--f-display); font-weight: var(--fw-heavy);
+  font-size: var(--fs-num); line-height: var(--lh-num);
+  letter-spacing: var(--ls-title); color: var(--signal);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: clamp(30px, 4.5vw, 56px);
+}
+.pain-row h3 { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h4); line-height: var(--lh-heading); color: var(--inv); margin-bottom: 12px; }
+.pain-row p { color: var(--inv-soft); font-size: var(--fs-small); line-height: var(--lh-compact); }
+
+/* =================================================================
+   SERVICES — 2 majors + directory-список
+   ================================================================= */
+/* Послуги: текстова колонка ліворуч, каталог у дві колонки праворуч.
+   Кадр прибрано — сім рядків самі тримають блок, а фото відсувало список у кут */
+/* послуги йдуть одразу за темною секцією симптомів — зверху потрібне ширше
+   поле, інакше каталог починається впритул до чорного краю */
+#services { padding-top: clamp(110px, 16vw, 220px); }
+.svc-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.1fr); gap: clamp(28px, 4vw, 72px); align-items: start; }
+.svc-head { margin-bottom: clamp(28px, 4vw, 44px); }
+/* текстова колонка коротша за каталог — тримаємо її по центру висоти,
+   інакше під нею лишалася порожня третина блоку. Але align-self: center
+   рахує центр від живої висоти каталогу, тож кожне розгортання підсувало
+   заголовок донизу. Тепер він стоїть від верху, а центрує його відступ,
+   порахований у скрипті один раз — за згорнутим списком */
+.svc-layout .svc-head { margin-bottom: 0; align-self: start; padding-top: var(--svc-head-top, 0px); }
+.svc-head .label { margin-bottom: 20px; }
+/* у вузькій колонці загальносайтовий кегль h2 ламав заголовок на три рядки */
+.svc-layout .svc-head .h2 { font-size: var(--fs-h2); max-width: none; }
+.svc-lead { margin-top: 20px; color: var(--tx-soft); font-size: var(--fs-body); line-height: var(--lh-body); max-width: 38ch; }
+/* дві незалежні колонки, а не один потік: інакше розгортання рядка ліворуч
+   штовхало б донизу і сусідній рядок праворуч */
+.svc-accordion { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(24px, 3.4vw, 56px); align-items: start; }
+.svc-col { border-top: 1px solid var(--line); }
+.svc-item { border-bottom: 1px solid var(--line); }
+.svc-row { display: grid; grid-template-columns: 34px 1fr 32px; gap: 10px; align-items: center; width: 100%; padding: 17px 2px; background: none; border: none; cursor: pointer; text-align: left; }
+/* на наведенні номер і назва зсуваються трансформом, а не падінгом: падінг
+   звужував колонку, довга назва переносилась на другий рядок і рядок стрибав */
+.svc-row .no, .svc-row .nm { transition: transform .25s var(--ease); }
+.svc-row:hover .no, .svc-row:hover .nm { transform: translateX(6px); }
+.svc-row .no { font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-meta); letter-spacing: var(--ls-meta); color: var(--signal); font-variant-numeric: tabular-nums; }
+.svc-row .nm { font-weight: var(--fw-ui); font-size: var(--fs-small); line-height: var(--lh-title); color: var(--tx); }
+/* плюсик той самий, що у FAQ (.qa-ic) — один елемент на всі згортання */
+.svc-desc { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s var(--ease); }
+.svc-desc > span { overflow: hidden; display: block; }
+.svc-item.open .svc-desc { grid-template-rows: 1fr; }
+.svc-desc-inner { display: block; padding: 0 6px 22px 44px; color: var(--tx-soft); font-size: var(--fs-small); line-height: var(--lh-body); }
+.svc-majors { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 3vw, 40px); margin-bottom: 18px; }
+.major { border-top: 1px solid var(--ink); padding-top: 24px; }
+.major .label { display: flex; margin-bottom: 16px; }
+.major h3 { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h3); line-height: var(--lh-heading); margin-bottom: 14px; }
+.major p { color: var(--tx-soft); max-width: 46ch; font-size: var(--fs-body); }
+.directory { border-top: 1px solid var(--line); }
+.directory a { display: grid; grid-template-columns: 36px 1fr auto; gap: 16px; align-items: center; padding: 20px 4px; border-bottom: 1px solid var(--line); transition: color .25s; }
+.directory a:hover { color: var(--signal); }
+.directory .no { font-family: var(--f-body); font-size: var(--fs-meta); color: var(--tx-mute); }
+.directory .nm { font-family: var(--f-display); font-weight: var(--fw-text); font-size: var(--fs-h4); }
+.directory .ar { font-family: var(--f-body); color: var(--signal); opacity: 0; transition: opacity .25s, transform .25s var(--ease); }
+.directory a:hover .ar { opacity: 1; transform: translateX(4px); }
+
+/* =================================================================
+   CASES — featured + дрібніші (ієрархія, не сітка)
+   ================================================================= */
+.cases-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(34px, 5vw, 56px); }
+/* заголовок секції кейсів тримаємо у два рядки (text-wrap: balance ділить його
+   навпіл), щоб кнопка «Усі кейси» лишалася праворуч, а не з'їжджала під нього */
+#cases .cases-head .h2 { max-width: 16ch; }
+/* margin-left: auto, а не тільки space-between: коли заголовок і кнопка не
+   вміщаються в рядок, кнопка переноситься вниз — і без цього ставала б там
+   ліворуч. Так вона тримається правого краю в будь-якій ширині */
+#cases .cases-head .btn { flex: none; margin-left: auto; }
+
+/* =================================================================
+   CASES — картки в каруселі, розбір розгортається панеллю під нею
+   ================================================================= */
+.ccard {
+  display: grid; grid-template-rows: auto 1fr auto; gap: 0;
+  text-align: left; padding: 0;
+  background: var(--surface);
+  /* без рамки: прозорий бордер підсвічував білу підкладку картки
+     і лишав волосяну смужку по контуру фото */
+  border: none; border-radius: 20px;
+  /* обкладинка йде в край, тому кути ріже сама картка */
+  overflow: hidden;
+  transition: transform .35s var(--ease-expo), box-shadow .35s var(--ease-expo);
+}
+.ccard-body { padding: 20px 22px 0; }
+.ccard .go { padding: 16px 22px 22px; }
+.ccard:hover { transform: translateY(-4px); }
+/* активний кейс позначаємо кільцем, а не бордером — щоб не з'їхала верстка */
+.ccard[aria-expanded="true"] { transform: none; box-shadow: 0 0 0 1px var(--ink); }
+@media (prefers-reduced-motion: reduce) { .ccard:hover { transform: none; } }
+
+/* сітка кейсів — усі картки видно одразу, без гортання */
+.ccards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2vw, 22px); }
+
+/* обкладинка: поки фото немає — на його місці головна цифра кейсу */
+.ccard-media { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3; overflow: hidden; background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.ccard-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* цифра — не заглушка на час завантаження, а запас на випадок відсутнього файлу:
+   інакше вона блимає в кожній картці, поки фото їде. Показуємо лише після помилки */
+.ccard-fallback { display: none; text-align: center; padding: 12px; }
+.ccard-media.no-cover .ccard-fallback { display: block; }
+.ccard-fallback .v { display: block; font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-num); line-height: var(--lh-num); letter-spacing: var(--ls-display); color: var(--signal); }
+.ccard-fallback .k { display: block; margin-top: 11px; font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-ui); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); }
+
+.ccard .nm { display: block; font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h5); line-height: var(--lh-title); letter-spacing: var(--ls-heading); margin-bottom: 9px; }
+.ccard .ttl { display: block; font-size: var(--fs-small); line-height: var(--lh-compact); color: var(--tx-soft); }
+.ccard .go { font-family: var(--f-body); font-size: var(--fs-meta); color: var(--signal); display: flex; align-items: center; gap: 8px; }
+.ccard .go .arr { transition: transform .3s var(--ease); }
+.ccard:hover .go .arr { transform: translateX(5px); }
+
+/* шапка розбору кейсу */
+
+/* =================================================================
+   СТОРІНКА ОДНОГО КЕЙСУ
+   ================================================================= */
+/* шлях угорі: видно, де людина є, і як вернутись на крок назад */
+/* повернення до списку — одна очевидна дія замість шляху з трьох ланок */
+.case-back { padding-top: clamp(18px, 3vw, 30px); }
+.case-back a { display: inline-flex; align-items: center; gap: 9px; font-family: var(--f-body); font-size: var(--fs-meta); font-weight: var(--fw-ui); letter-spacing: var(--ls-meta); color: var(--tx-mute); transition: opacity .2s, color .2s; }
+.case-back a:hover { color: var(--signal); }
+/* стрілка від'їжджає вліво — туди, куди веде посилання */
+.case-back .arr { font-size: var(--fs-ui); transition: transform .3s var(--ease); }
+.case-back a:hover .arr { transform: translateX(-4px); }
+
+.cpanel--page { padding-top: clamp(22px, 3vw, 34px); padding-bottom: clamp(40px, 5vw, 70px); }
+
+/* =================================================================
+   ШАПКА КЕЙСУ
+   ================================================================= */
+/* Ліворуч назва, лід і дія; праворуч кадр із головною цифрою кейсу.
+   Останнє слово назви рожеве — той самий прийом, що в герої головної */
+.chero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .6fr); gap: clamp(28px, 4vw, 70px); align-items: center; padding-block: clamp(18px, 2.5vw, 32px) clamp(34px, 5vw, 62px); }
+.chero-text .label { margin-bottom: clamp(16px, 2vw, 22px); }
+.chero-h { font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-h1); line-height: var(--lh-num); letter-spacing: var(--ls-display); text-wrap: balance; }
+.chero-h .ac { color: var(--signal); }
+.chero-lead { margin-top: clamp(18px, 2.4vw, 26px); font-size: var(--fs-lead); font-weight: var(--fw-ui); line-height: var(--lh-compact); max-width: 32ch; }
+.chero-meta { display: flex; flex-wrap: wrap; align-items: center; margin: clamp(18px, 2.4vw, 26px) 0 clamp(24px, 3vw, 34px); font-family: var(--f-body); font-size: var(--fs-meta); color: var(--tx-mute); }
+/* роздільник — рожева крапка, а не ще один шматок тексту */
+.chero-meta span + span::before { content: "\00b7"; color: var(--signal); opacity: 1; margin: 0 14px; }
+
+.chero-media { position: relative; border-radius: var(--r-card); overflow: hidden; background: var(--ink); aspect-ratio: 4 / 5; }
+/* кадр світліший — фото видно; затемнення лишається тільки внизу, під цифрою */
+.chero-media img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 1; }
+/* сяйво згори й затемнення знизу — щоб цифра лягла на кадр і читалась */
+.chero-media::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 45% at 50% 32%, color-mix(in srgb, var(--signal) 18%, transparent), transparent 70%); }
+.chero-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, color-mix(in srgb, var(--ink) 50%, transparent) 0%, color-mix(in srgb, var(--ink) 16%, transparent) 28%, transparent 50%); }
+/* тінь під текстом замість щільного градієнта: цифра читається навіть на
+   світлому кадрі, а саме фото лишається чистим */
+.chero-media figcaption { text-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 50%, transparent), 0 4px 22px color-mix(in srgb, var(--ink) 65%, transparent); position: absolute; left: clamp(18px, 2.5vw, 30px); right: clamp(18px, 2.5vw, 30px); bottom: clamp(18px, 2.5vw, 28px); z-index: 1; display: flex; align-items: flex-end; gap: 14px; }
+.chero-media b { font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-num); line-height: var(--lh-num); letter-spacing: var(--ls-display); color: var(--inv); }
+.chero-media i { font-style: normal; font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-ui); line-height: var(--lh-title); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--inv-soft); padding-bottom: 3px; }
+
+@media (max-width: 860px) {
+  .chero { grid-template-columns: minmax(0, 1fr); gap: clamp(24px, 4vw, 34px); }
+  /* портретний кадр на вузькому екрані задирає шапку — кладемо його горизонтально */
+  .chero-media { aspect-ratio: 16 / 11; }
+  .chero-lead { max-width: none; }
+}
+@media (max-width: 560px) {
+  /* довгі слова назви («Стоматологічна», «Український») на загальному h1
+     виходили за край екрана — слово не переноситься, бо кожна літера окремий блок */
+  /* кегль бере --fs-h1, зменшений у :root для вузького екрана */
+}
+@media (max-width: 380px) {
+  /* на 320px «недозаробляєте» в контактах не влазило в рядок */
+  :root { --fs-h2: clamp(1.6rem, 8.2vw, 1.9rem); }
+}
+
+/* колонка читання. Одиниця ch тут широка (≈12px), тож 68ch давали рядок на
+   сотню знаків — око після 80 губить початок наступного рядка й текст
+   «зливається». Тримаємо ту саму ширину, що й у вступі: ~70 знаків */
+.cpanel--page .cc-block > p,
+.cpanel--page .cc-block > .cc-list { max-width: 50ch; }
+/* більше повітря між розділами, щоб вони читались як окремі, а не суцільним полотном */
+.cpanel--page .cc-block { margin-bottom: clamp(40px, 5.5vw, 68px); }
+/* перехід до сусіднього кейсу — читач дочитав і йому є куди йти далі */
+.case-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: clamp(26px, 3vw, 36px); border-top: 1px solid var(--line); }
+.case-nav a { display: flex; align-items: center; gap: 12px; max-width: 42%; transition: color .2s; }
+.case-nav a:hover { color: var(--signal); }
+.case-nav .dir { font-family: var(--f-body); font-size: var(--fs-body); flex: none; }
+.case-nav .lbl { display: block; font-family: var(--f-body); font-size: var(--fs-caps); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); margin-bottom: 4px; font-weight: var(--fw-ui); }
+.case-nav .nm { display: block; font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h5); line-height: var(--lh-title); letter-spacing: var(--ls-title); }
+/* margin-left: auto — щоб «наступний» лишався праворуч і на першому кейсі,
+   де сусіда зліва немає */
+.case-nav-next { margin-left: auto; text-align: right; flex-direction: row-reverse; }
+@media (max-width: 700px) {
+  /* на телефоні три колонки не вміщаються: сусіди в рядок, «усі кейси» під ними */
+  .case-nav { gap: 10px 16px; }
+  .case-nav a { max-width: 46%; }
+  .case-nav .nm { font-size: var(--fs-ui); }
+}
+
+.kpis { display: flex; gap: clamp(16px, 2.4vw, 34px); align-items: baseline; }
+.kpi { display: block; text-align: right; }
+.kpi b { display: block; font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-stat); line-height: var(--lh-num); letter-spacing: var(--ls-display); }
+.kpi i { display: block; margin-top: 6px; font-family: var(--f-body); font-style: normal; font-size: var(--fs-caps); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); font-weight: var(--fw-ui); }
+
+.cc-two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 56px); margin-bottom: clamp(30px, 4vw, 48px); }
+/* два цілі блоки поруч: таблиця динаміки вузька, і праворуч від неї лишалася
+   порожня половина рядка, поки висновок чекав унизу. Власні відступи блоків
+   гасимо — крок між парами тримає сам грід */
+.cc-two--blocks { align-items: start; }
+.cc-two--blocks > .cc-block { margin-bottom: 0; }
+.cc-h { font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--signal); margin-bottom: 12px; }
+.cc-block { margin-bottom: clamp(30px, 4vw, 48px); }
+/* Розділи кейсу мають два рівні, а не сім однакових ярликів: головні — назвою
+   шрифтом заголовків, службові («Про проєкт», підписи до скрінів) лишаються
+   дрібним рожевим капсом */
+.cc-head { margin-bottom: clamp(16px, 2vw, 22px); }
+.cc-h--big { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h4); line-height: var(--lh-title); letter-spacing: var(--ls-heading); text-transform: none; color: var(--tx); margin-bottom: 0; }
+/* акти сторінки розділяє повітря, а не волосинка: ліній і так вистачає
+   в таблицях і скрінах */
+.cc-block--major { padding-top: clamp(26px, 3.2vw, 40px); }
+.cc-block:last-child { margin-bottom: 0; }
+.cc-block p { color: var(--tx-soft); max-width: 68ch; }
+.cc-list { display: grid; gap: 9px; max-width: 72ch; }
+.cc-list li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; font-size: var(--fs-small); line-height: var(--lh-compact); color: var(--tx-soft); }
+.cc-list li::before { content: "▸"; color: var(--signal); font-size: var(--fs-meta); line-height: 1.75; }
+.cc-list .grp { display: block; grid-column: 1 / -1; margin-top: 12px; font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-ui); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); }
+.cc-list .grp::before { content: none; }
+
+/* Роадмап: етапи роботи однією вертикаллю. Лінія тягнеться між кружками —
+   номер закриває її собою, тому має тло сторінки */
+/* padding: 0 обовʼязково — <ol> має власний відступ 40px, і лінія, яку рахує
+   від краю списку, розʼїжджалася з кружками */
+.road { --road-gap: clamp(26px, 3.2vw, 38px); list-style: none; padding: 0; display: grid; gap: var(--road-gap); max-width: 60ch; }
+/* лінію малює кожен етап до наступного, а не список цілком: інакше вона
+   звисає нижче останнього кружка, у порожнечу */
+.road-step::before { content: ""; position: absolute; left: 17px; top: 36px; bottom: calc(-1 * var(--road-gap)); width: 1px; background: color-mix(in srgb, var(--signal) 55%, transparent); }
+.road-step:last-child::before { content: none; }
+.road-step { position: relative; padding-left: 58px; }
+.road-no { position: absolute; left: 0; top: -2px; width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--signal) 45%, transparent); border-radius: 50%; background: var(--paper); font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold); letter-spacing: var(--ls-caps); color: var(--signal); }
+.road-h { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h5); line-height: var(--lh-title); letter-spacing: var(--ls-title); margin-bottom: 12px; padding-top: 6px; }
+.road-list { list-style: none; display: grid; gap: 8px; }
+.road-list li { position: relative; padding-left: 18px; font-size: var(--fs-small); line-height: var(--lh-compact); color: var(--tx-soft); }
+.road-list li::before { content: "▸"; position: absolute; left: 0; top: 0; font-size: var(--fs-meta); line-height: 1.75; color: var(--signal); }
+/* усередині білої картки лінію перекриває вже картка, а не сторінка */
+.cc-block--card .road-no { background: var(--white); }
+@media (max-width: 560px) {
+  .road-step { padding-left: 46px; }
+  .road::before { left: 14px; }
+  .road-no { width: 30px; height: 30px; }
+}
+
+/* цифри місяця — теж без рамок, тримаються на відступах */
+/* чотири в ряд: без рамок auto-fit кидав сім показників як 6+1, і останній
+   лишався сиротою в новому рядку */
+.nums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(22px, 2.8vw, 32px) clamp(18px, 2.4vw, 30px); }
+.nums div { padding: 0; min-width: 0; }
+.nums b { display: block; font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-stat); line-height: var(--lh-num); letter-spacing: var(--ls-display); white-space: nowrap; }
+.nums b .was { color: var(--tx-mute); font-size: .58em; font-weight: var(--fw-ui); }
+.nums span { display: block; margin-top: 9px; font-family: var(--f-body); font-size: var(--fs-caps); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); font-weight: var(--fw-ui); }
+
+/* =================================================================
+   ДІАГРАМИ В КЕЙСАХ
+   ================================================================= */
+/* Один акцент і сірий — не дві кольорові серії. Акцент — рожевий з лого.
+   Кожен стовпчик підписаний значенням, тож колір ніде не єдиний носій сенсу */
+/* біла картка під діаграмою: сторінка має тло #FDFCFC, тож чистий білий
+   плюс тінь піднімають блок із цифрами над текстом */
+.cc-block--card { background: var(--white); border-radius: var(--r-card); padding: clamp(22px, 3vw, 34px); box-shadow: var(--shadow-card); }
+.cc-block--card .cc-h { margin-bottom: 18px; }
+
+/* Легенди немає навмисно: кожен стовпчик підписаний своєю назвою («було»,
+   «стало», «бюджет») просто поруч — це сильніше за легенду й не лишає
+   кольору жодної ролі носія сенсу */
+.bars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(22px, 3vw, 34px) clamp(28px, 4vw, 56px); }
+.bar-row { display: grid; gap: 9px; min-width: 0; }
+.bar-name { font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-ui); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); }
+/* перша колонка тягнеться під довший підпис на кшталт «нових клієнтів» */
+.bar-line { display: grid; grid-template-columns: minmax(62px, max-content) minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.bar-cap { font-family: var(--f-body); font-size: var(--fs-meta); color: var(--tx-mute); }
+/* два рядки пари — окремі гріди, тож із підписами різної довжини стовпчики
+   стартували б із різних місць. Subgrid вирівнює колонку підписів на всю
+   пару; без підтримки subgrid лишається базовий розклад вище */
+@supports (grid-template-columns: subgrid) {
+  .bar-row { grid-template-columns: minmax(62px, max-content) minmax(0, 1fr) auto; column-gap: 10px; }
+  .bar-name { grid-column: 1 / -1; }
+  .bar-line { grid-template-columns: subgrid; grid-column: 1 / -1; }
+}
+.bar-track { display: block; min-width: 0; }
+/* 4px на кінці стовпчика — заокруглюється лише той край, що показує значення */
+.bar { display: block; width: var(--w); height: 13px; border-radius: 2px 4px 4px 2px; }
+.bar--was { background: color-mix(in srgb, var(--ink) 24%, transparent); }
+.bar--now { background: var(--signal); }
+.bar-val { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-ui); letter-spacing: var(--ls-title); white-space: nowrap; }
+.chart--after { margin-top: clamp(26px, 3.5vw, 40px); }
+
+/* динаміка по місяцях — лінія, бо це зміна в часі */
+/* min(100%, …) обовʼязковий: голий minmax(340px, 1fr) не дає колонці стиснутись
+   вужче за 340px, і на екрані 360px графік вилазив за край сторінки */
+.lcharts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: clamp(20px, 3vw, 36px); }
+.lchart figcaption { font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-ui); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); margin-bottom: 10px; }
+.lchart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.lchart .gl { stroke: var(--line); stroke-width: 1; }
+.lchart .ln { fill: none; stroke: var(--signal); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.lchart .dot { fill: var(--signal); }
+/* кільце кольору тла — крайні точки не зливаються з лінією */
+.lchart .dot--edge { stroke: var(--paper); stroke-width: 2; }
+.lchart .ax { font-family: var(--f-body); font-size: 10.5px; fill: var(--tx-mute); }
+.lchart .mo { font-size: 10px; }
+.lchart .vl { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: 13px; fill: var(--tx); }
+.lchart .mk { stroke: var(--line-2); stroke-width: 1; stroke-dasharray: 3 3; }
+.lchart .mkt { font-family: var(--f-body); font-size: 9.5px; fill: var(--tx-mute); text-anchor: middle; }
+.lchart .mkt--end { text-anchor: end; }
+@media (max-width: 700px) {
+  /* svg масштабується разом із текстом: на вузькому екрані підписи падали до
+     ~6px. Збільшуємо їх у системі координат графіка й лишаємо лише крайні
+     місяці — проміжні там усе одно нечитабельні */
+  .lchart .ax { font-size: 17px; }
+  .lchart .mo { font-size: 16px; }
+  .lchart .mo--mid { display: none; }
+  .lchart .vl { font-size: 21px; }
+  .lchart .mkt { font-size: 14px; }
+}
+
+@media (max-width: 700px) {
+  .bars { grid-template-columns: minmax(0, 1fr); }
+  .bar-line { grid-template-columns: minmax(54px, max-content) minmax(0, 1fr) auto; gap: 8px; }
+}
+
+/* динаміка по місяцях */
+/* уся таблиця дисплейним шрифтом, не лише виділені числа */
+.dyn { width: 100%; border-collapse: collapse; font-family: var(--f-display); font-weight: var(--fw-ui); letter-spacing: var(--ls-title); font-size: var(--fs-ui); max-width: 620px; }
+.dyn th, .dyn td { text-align: left; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); }
+.dyn th { font-size: var(--fs-caps); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); font-weight: var(--fw-ui); }
+.dyn td b { font-family: var(--f-display); font-weight: var(--fw-ui); letter-spacing: var(--ls-title); }
+.dyn tr:last-child td { border-bottom: none; }
+.dyn tr:last-child td b { color: var(--signal); }
+
+/* карусель скрінів: кабінет — широкі кадри, відгуки — вужчі, кілька в ряд */
+.gal { position: relative; }
+.gal-track {
+  display: flex; align-items: flex-start; gap: 14px;
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory; scroll-padding-left: 0;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.gal-track::-webkit-scrollbar { display: none; }
+.gal-track > * { flex: 0 0 auto; scroll-snap-align: start; }
+/* стрічка кейсів на головній — рухається лише від людини: свайп, стрілки,
+   перетягування мишею. Автопрокрутки немає навмисно: картки треба читати */
+.gal--cases .gal-track {
+  align-items: stretch; gap: 18px;
+  /* Стрічка більше не витікає в поля сторінки: обріз іде рівно по краю колонки,
+     під кнопкою «Усі кейси». Відступи лишилися тільки вертикальні — щоб
+     overflow-x не зрізав тіні карток зверху й знизу */
+  margin: -22px 0; padding: 22px 0;
+  scroll-padding-left: 0;
+}
+/* три картки плюс краєчок четвертої: видно, що стрічку є куди гортати, і при
+   цьому вона обривається там само, де закінчується кнопка */
+.gal--cases .gal-track > * { width: calc((100% - 3 * 18px - 56px) / 3); }
+.gal--cases .gal-track:focus-visible { outline: 2px solid var(--signal); outline-offset: -4px; }
+/* курсор підказує, що стрічку можна тягнути */
+.gal--cases .gal-track.can-drag { cursor: grab; }
+.gal--cases .gal-track.dragging { cursor: grabbing; scroll-snap-type: none; }
+.gal--cases .gal-track.dragging .ccard { pointer-events: none; }
+.gal--cases .gal-nav { margin-top: 20px; }
+
+.shot { display: block; padding: 0; border: none; border-radius: var(--r-card); overflow: hidden; background: var(--surface); cursor: zoom-in; box-shadow: var(--shadow-card); transition: box-shadow .3s var(--ease-expo), transform .3s var(--ease-expo); }
+.shot:hover { box-shadow: var(--shadow-lift); transform: translateY(-2px); }
+
+/* Скріни кабінету — колонкою, кожен із підписом: таблиця сама по собі
+   нечитабельна, підпис каже, куди дивитись. Кадр не розтягуємо: широкий іде
+   на всю ширину, високий обмежуємо по висоті — рамка хапає розмір картинки */
+/* три широкі таблиці поспіль зливались в одне полотно — даємо їм більше повітря */
+.shots { display: grid; gap: clamp(28px, 3.6vw, 48px); }
+.shots .shot { width: fit-content; max-width: 100%; margin-inline: auto; }
+.shots img { display: block; max-width: 100%; max-height: 560px; width: auto; height: auto; }
+/* відгуки — у два стовпці: у вузькій колонці текст у бульбашці не прочитати */
+/* дві колонки; скріни в них розкладає main.js — кожен у ту, що зараз коротша.
+   Так колонки закінчуються майже врівень і під коротким відгуком не лишається
+   дірки. Без скрипта лишається звичайна сітка */
+.revs { --revs-gap: clamp(14px, 2vw, 20px); display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: var(--revs-gap); align-items: start; }
+.revs--masonry { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.revs-col { display: grid; gap: var(--revs-gap); align-content: start; min-width: 0; }
+@media (max-width: 860px) {
+  /* в одну колонку — повертаємо скріни в хронологічний порядок */
+  .revs--masonry { display: flex; flex-direction: column; }
+  .revs--masonry .revs-col { display: contents; }
+}
+.revs img { display: block; width: 100%; height: auto; }
+.shot-fig { display: grid; gap: 10px; min-width: 0; }
+.shot-fig figcaption { font-family: var(--f-body); font-size: var(--fs-meta); line-height: var(--lh-compact); letter-spacing: var(--ls-meta); color: var(--tx-mute); text-align: center; }
+@media (max-width: 700px) {
+  /* таблиця кабінету на весь екран телефона стискається в нечитабельну смужку.
+     Даємо їй горизонтальний скрол: кадр лишається одним, його просто гортають
+     убік до потрібного стовпця. Відгуків це не стосується — там великий текст */
+  .shots .shot-fig--wide .shot { width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+  .shots .shot-fig--wide img { max-width: none; min-width: 680px; }
+}
+@media (prefers-reduced-motion: reduce) { .shot:hover { transform: none; } }
+.shot img { width: 100%; height: auto; }
+
+.gal-nav { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.gal-btn {
+  width: 40px; height: 40px; flex: 0 0 auto;
+  display: grid; place-items: center;
+  /* гортання — дія, а не текст, тож стрілки беруть сигнальний рожевий */
+  border: 1px solid var(--signal); border-radius: var(--r-cta);
+  color: var(--signal);
+  font-family: var(--f-body); font-size: var(--fs-small); line-height: 1;
+  transition: background .2s var(--ease), color .2s var(--ease), opacity .2s;
+}
+.gal-btn:hover:not([disabled]) { background: var(--signal); color: var(--white); }
+.gal-btn[disabled] { opacity: .22; cursor: default; }
+.gal-count { font-family: var(--f-body); font-size: var(--fs-meta); letter-spacing: var(--ls-meta); color: var(--tx-mute); }
+/* лічильник — тихий сірий підпис цілком: поточний номер не виділяємо */
+.gal-count b { font-weight: inherit; color: inherit; }
+
+/* відео-відгуки — плитки, а не три плеєри на всю колонку.
+   Вертикальне відео в третину ширини давало 680px висоти й з'їдало екран */
+.vids-sec { padding-top: clamp(20px, 3vw, 34px); padding-bottom: clamp(60px, 8vw, 110px); }
+.vids-sec .cases-head { margin-bottom: clamp(22px, 3vw, 34px); }
+.vids { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 2vw, 20px); }
+/* Прев'ю — брендова обкладинка 1.9:1 із цитатою, а не кадр дзвінка. Тому
+   плитка без фіксованого aspect-ratio: висоту задає сама обкладинка, і три
+   однакові за розміром файли дають три рівні плитки без чорних полів */
+.vid-tile { display: grid; padding: 0; border-radius: var(--r-card); overflow: hidden; background: var(--ink); box-shadow: var(--shadow-card); transition: transform .35s var(--ease-expo), box-shadow .35s var(--ease-expo); }
+.vid-tile img { grid-area: 1 / 1; align-self: start; width: 100%; height: auto; opacity: .96; transition: opacity .35s var(--ease); }
+.vid-tile:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+.vid-tile:hover img { opacity: 1; }
+/* нижній рядок обкладинки: тривалість зліва, кнопка справа. По центру кнопка
+   накривала цитату, тож обоє стоять унизу — на логотипі, а не на тексті.
+   position+z-index обовʼязкові: <img> як замінений елемент малюється поверх тла
+   наступних сусідів, і кнопка ховалась під обкладинкою */
+/* тривалість — щоб плитку було видно як відео, а не як картинку. Кут лівий
+   верхній: унизу зліва вона лізла на кружечок із фото */
+.vid-time { grid-area: 1 / 1; place-self: start start; position: relative; z-index: 1; margin: 12px 0 0 14px; padding: 4px 9px; border-radius: 999px; background: var(--white); box-shadow: var(--shadow-float); font-family: var(--f-body); font-size: var(--fs-meta); font-weight: var(--fw-ui); line-height: 14px; letter-spacing: var(--ls-meta); color: var(--tx); }
+/* коло біле, трикутник тушшю: маґента кнопки на маґенті обкладинки зливалась */
+.vid-play { grid-area: 1 / 1; place-self: end end; position: relative; z-index: 1; margin: 0 14px 12px 0; width: 40px; height: 40px; border-radius: 50%; background: var(--white); display: grid; place-items: center; box-shadow: var(--shadow-float); transition: transform .35s var(--ease-expo); }
+.vid-play::after { content: ""; border-style: solid; border-width: 7px 0 7px 11px; border-color: transparent transparent transparent var(--ink); margin-left: 3px; }
+.vid-tile:hover .vid-play { transform: scale(1.08); }
+@media (prefers-reduced-motion: reduce) { .vid-tile:hover { transform: none; } .vid-tile:hover .vid-play { transform: none; } }
+
+/* лайтбокс — скріни дрібні, без нього не прочитати */
+.lbox { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: clamp(16px, 4vw, 48px); background: color-mix(in srgb, var(--ink) 92%, transparent); cursor: zoom-out; }
+.lbox.show { display: flex; }
+.lbox img, .lbox video { max-width: 100%; max-height: 100%; width: auto; object-fit: contain; border-radius: var(--r-hair); }
+/* кадр відео 9:16 задано наперед: без цього вікно спершу бралось за розмір
+   постера-обкладинки (1.9:1), а після метаданих перескакувало у вертикаль */
+.lbox video { display: none; cursor: default; border-radius: var(--r-card); aspect-ratio: 9 / 16; height: 100%; width: auto; background: var(--ink); }
+.lbox.is-video img { display: none; }
+.lbox.is-video video { display: block; }
+.lbox-close { position: absolute; top: 14px; right: 18px; font-family: var(--f-body); font-size: var(--fs-h4); line-height: 1; color: var(--inv); padding: 8px 12px; }
+body.lbox-open { overflow: hidden; }
+
+/* =================================================================
+   PROCESS — темна горизонтальна стрічка, mono
+   ================================================================= */
+.process { background: var(--ink); color: var(--inv); }
+.process .label--inv { display: flex; margin-bottom: 30px; }
+.process h2 { color: var(--inv); margin-bottom: clamp(40px, 6vw, 68px); max-width: 16ch; }
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--inv-line); border: 1px solid var(--inv-line); }
+.step { background: var(--ink); padding: 26px 22px 28px; }
+.step .no { font-family: var(--f-body); font-size: var(--fs-meta); color: var(--signal); margin-bottom: 40px; display: block; }
+.step h3 { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h4); color: var(--inv); margin-bottom: 10px; }
+.step p { color: var(--inv-soft); font-size: var(--fs-small); }
+
+/* =================================================================
+   FOUNDER
+   ================================================================= */
+.founder-grid { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: clamp(28px, 5vw, 68px); align-items: center; }
+.founder-photo { display: flex; flex-direction: column; gap: 16px; }
+.founder-photo .media { aspect-ratio: 3/4; border-radius: var(--r-card); }
+.founder-name { display: flex; flex-direction: column; gap: 4px; }
+.founder-name strong { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h4); letter-spacing: var(--ls-title); color: var(--tx); }
+.founder-name span { font-family: var(--f-body); font-size: var(--fs-caps); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--signal); font-weight: var(--fw-bold); }
+.founder-txt .label { display: flex; margin-bottom: 18px; }
+.founder-txt h2 { margin-bottom: 22px; }
+.founder-txt p { color: var(--tx-soft); max-width: 50ch; margin-bottom: 14px; }
+/* цифри агенції — без обводки: числа й так тримають ритм, рамка лише дробила блок */
+.founder-facts { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 34px; gap: clamp(22px, 3vw, 34px) clamp(18px, 2.5vw, 30px); }
+.fact { padding: 0; }
+.fact .n { font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-h3); line-height: var(--lh-num); letter-spacing: var(--ls-heading); }
+.fact .n .sig { color: var(--signal); }
+.fact .t { font-family: var(--f-body); font-size: var(--fs-caps); color: var(--tx-mute); margin-top: 10px; text-transform: uppercase; letter-spacing: var(--ls-caps); line-height: var(--lh-compact); max-width: 16ch; text-wrap: balance; font-weight: var(--fw-ui); }
+
+/* =================================================================
+   QUOTE — один великий editorial pull-quote
+   ================================================================= */
+.quote-sec { background: var(--ink); color: var(--inv); }
+/* цитата на повний h2 займала сім рядків і читалась як стіна. Щабель менше —
+   і відкривна лапка винесена за край, щоб текст стояв рівно по лівій лінії */
+.quote-sec blockquote { font-family: var(--f-display); font-weight: var(--fw-text); font-size: var(--fs-quote); line-height: var(--lh-title); letter-spacing: var(--ls-title); max-width: 26ch; text-indent: -.42em; }
+.quote-sec blockquote .sig { color: var(--signal); }
+.quote-sec .by { display: flex; align-items: center; gap: 14px; margin-top: 36px; }
+/* підпис під головною цитатою і під короткими відгуками — одне правило,
+   щоб імена в секції не жили за різними шрифтовими розмірами */
+.quote-sec .who { font-family: var(--f-body); font-size: var(--fs-ui); font-weight: var(--fw-ui); color: var(--inv); }
+.quote-sec .who b { color: var(--inv); }
+.quote-sec .who span { color: var(--inv-mute); font-weight: var(--fw-text); }
+.quote-sec .ava { flex: none; width: 54px; height: 54px; border-radius: 50%; }
+.quote-sec .ava img { filter: grayscale(1); }
+/* поруч із великою цитатою короткі відгуки губились — фото трохи більше */
+.tst2 .ava { width: 64px; height: 64px; }
+
+/* додаткові відгуки під великою цитатою (ТЗ: текст+імʼя+ніша+фото) */
+.tst-more { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 52px); margin-top: clamp(56px, 7vw, 96px); }
+.tst2 { display: flex; gap: 18px; align-items: flex-start; }
+
+.tst2 .q { color: var(--inv-soft); font-size: var(--fs-body); line-height: var(--lh-compact); margin-bottom: 12px; }
+
+
+/* =================================================================
+   ACADEMY PAGE — програми
+   ================================================================= */
+.programs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 3vw, 40px); }
+/* картка курсу — біла плита з тінню, як блок результатів у кейсах.
+   Реакції на наведення немає: клікабельна тут лише кнопка, не вся картка */
+.program { background: var(--white); border-radius: 20px; box-shadow: var(--shadow-card); padding: clamp(28px, 3.2vw, 44px); display: flex; flex-direction: column; }
+/* тривалість — мітка картки: рожева пігулка над назвою курсу.
+   order ставить її першою без змін у розмітці; align-self не дає
+   розтягтися на всю ширину колонкового флексу */
+.program .dur {
+  order: -1; align-self: flex-start;
+  margin: 0 0 18px; padding: 6px 13px;
+  border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent);
+  border-radius: var(--r-cta);
+  background: color-mix(in srgb, var(--signal) 8%, transparent);
+  font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-caps); text-transform: uppercase;
+  color: var(--signal);
+}
+/* назва курсу рожевим — картка читається як окрема пропозиція, а не як
+   черговий підрозділ сторінки */
+.program h2 { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h3); line-height: var(--lh-heading); margin-bottom: 14px; color: var(--signal); }
+.program > p { color: var(--tx-soft); margin-bottom: 24px; }
+/* три блоки всередині картки читались як один суцільний список — у всіх була
+   та сама стрілка. Тепер у кожного своя форма: формат — теги, кроки —
+   нумерація, результат — окрема плашка з галочками */
+.prog-block + .prog-block { margin-top: 34px; }
+/* підзаголовки блоків картки — дисплейним шрифтом і повною тушшю: тихі
+   моношрифтові мітки губилися під рожевою назвою курсу */
+.program h3 {
+  font-family: var(--f-display); font-weight: var(--fw-ui);
+  font-size: var(--fs-h5);
+  text-transform: none; letter-spacing: var(--ls-title);
+  color: var(--tx); margin: 0 0 16px;
+}
+.program li { position: relative; color: var(--tx-soft); font-size: var(--fs-small); }
+
+/* формат — рівний список із тим самим маркером, що й у кейсах. Теги
+   різної довжини складались у рваний стовпчик пігулок */
+.prog-chips { display: grid; gap: 10px; }
+.prog-chips li { padding-left: 24px; }
+.prog-chips li::before { content: "▸"; position: absolute; left: 0; top: 0; font-size: var(--fs-meta); line-height: 1.75; color: var(--signal); }
+
+/* кроки програми — по порядку, тому нумерація, а не стрілки */
+.prog-steps ol { display: grid; gap: 11px; counter-reset: pstep; list-style: none; padding: 0; }
+.prog-steps li { padding-left: 34px; counter-increment: pstep; }
+/* номер — той самий, що в каталозі послуг на головній: дисплейний шрифт,
+   жирне накреслення, табличні цифри, щоб 01 і 02 стояли колонкою */
+.prog-steps li::before { content: counter(pstep, decimal-leading-zero); position: absolute; left: 0; top: .3em; font-family: var(--f-display); font-size: var(--fs-meta); font-weight: var(--fw-heavy); letter-spacing: var(--ls-meta); font-variant-numeric: tabular-nums; color: var(--signal); }
+
+/* результат — те, заради чого все; виносимо на плашку */
+.prog-result { background: var(--surface); border-radius: var(--r-card); padding: 20px 22px; border-top: 0; }
+.prog-block + .prog-result { margin-top: 26px; padding-top: 20px; }
+.prog-result ul { display: grid; gap: 10px; }
+.prog-result li { padding-left: 28px; color: var(--tx); }
+.prog-result li::before { content: "✓"; position: absolute; left: 0; top: -.02em; color: var(--signal); font-family: var(--f-body); font-weight: var(--fw-bold); }
+
+/* auto притискає кнопку до низу, щоб у двох картках різної довжини вона стояла
+   на одній лінії; відступ тримає остання плашка, бо margin-top: 30px
+   перебивав би auto */
+.program .btn { margin-top: auto; align-self: flex-start; }
+.program .prog-result { margin-bottom: 30px; }
+.prog-body { flex: 1; display: flex; flex-direction: column; }
+.prog-body > div { display: flex; flex-direction: column; flex: 1; }
+/* кнопка згортання потрібна лише на телефоні */
+.prog-toggle { display: none; }
+
+/* =================================================================
+   ACADEMY — один рядок
+   ================================================================= */
+/* блок на звичайному тлі сторінки: ні темної плашки, ні рисочок-роздільників
+   зверху й знизу — межі задають самі відступи */
+.academy { display: flex; justify-content: space-between; align-items: center; gap: 28px; flex-wrap: wrap; padding-block: clamp(48px, 6vw, 80px); }
+/* Кадр у кружку ліворуч від тексту. height: auto обовʼязковий: атрибути
+   width/height на <img> діють як стилі й без нього перебивають aspect-ratio */
+.academy-ava { flex: none; width: clamp(130px, 16vw, 210px); height: auto; aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
+/* текст забирає решту рядка, тож кружок і заголовок стоять поруч,
+   а кнопка лишається притиснутою до правого краю */
+.academy-txt { flex: 1 1 340px; }
+.academy h3 { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h3); color: var(--signal); }
+.academy p { color: var(--tx-soft); max-width: 52ch; margin-top: 10px; }
+
+/* =================================================================
+   FAQ — inline Q&A, без акордеона
+   ================================================================= */
+/* FAQ: заголовок ліворуч, питання праворуч розгортаються.
+   Чотири відкриті відповіді в сітці читалися як суцільна стіна тексту */
+.faq-layout { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(30px, 5vw, 80px); align-items: start; }
+.faq-aside { position: sticky; top: 100px; }
+.faq-aside .label { margin-bottom: 18px; }
+.faq-list { border-top: 1px solid var(--line); }
+.qa { border-bottom: 1px solid var(--line); }
+.qa-q { display: grid; grid-template-columns: 1fr 28px; gap: 20px; align-items: center; width: 100%; padding: 22px 2px; text-align: left; }
+.qa-q h3 { transition: transform .25s var(--ease); }
+.qa-q:hover h3 { transform: translateX(8px); }
+.qa h3 { font-family: var(--f-display); font-weight: var(--fw-text); font-size: var(--fs-h5); line-height: var(--lh-title); text-wrap: pretty; }
+/* balance ділив коротке питання навпіл і лишав праворуч порожню третину рядка */
+
+/* плюс, що стає мінусом — намальований двома смужками, без іконкового шрифту */
+.qa-ic { position: relative; width: 16px; height: 16px; justify-self: end; }
+.qa-ic::before, .qa-ic::after { content: ""; position: absolute; inset: 0; margin: auto; background: var(--signal); transition: transform .35s var(--ease-expo), opacity .25s; }
+.qa-ic::before { width: 16px; height: 2px; }
+.qa-ic::after { width: 2px; height: 16px; }
+[aria-expanded="true"] .qa-ic::after { transform: rotate(90deg); opacity: 0; }
+
+.qa-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s var(--ease-expo); }
+.qa-a > div { overflow: hidden; }
+.qa.open .qa-a { grid-template-rows: 1fr; }
+.qa-a p { color: var(--tx-soft); font-size: var(--fs-body); line-height: var(--lh-body); max-width: 56ch; padding: 0 40px 24px 2px; }
+/* у відповіді з кількох абзаців нижній відступ першого правив би за між-
+   абзацний — а 24px там завеликі; повний відступ лишаємо тільки останньому */
+.qa-a p:not(:last-child) { padding-bottom: 13px; }
+
+/* =================================================================
+   CONTACT — темна, форма у стилі терміналу
+   ================================================================= */
+.contact { background: var(--ink); color: var(--inv); }
+.contact .label--inv { display: flex; margin-bottom: 24px; }
+/* minmax(0, …): інакше «недозаробляєте» розпирало ліву колонку, і форма
+   не діставала до правого краю сітки на 24px */
+.contact-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(36px, 5vw, 80px); align-items: start; }
+.contact h2 { color: var(--inv); margin-bottom: 20px; max-width: 16ch; }
+.contact-intro { color: var(--inv-soft); max-width: 46ch; font-size: var(--fs-body); }
+.contact-direct { margin-top: 40px; display: grid; gap: 2px; max-width: 420px; }
+/* канал і значення — дві колонки, значення вирівняні по лівому краю: з
+   space-between кожне стояло на своїй висоті праворуч і рядки розсипались */
+.contact-direct a { display: grid; grid-template-columns: 132px minmax(0, 1fr); align-items: center; gap: 16px; padding: 15px 2px; border-bottom: 1px solid var(--inv-line); font-family: var(--f-body); font-size: var(--fs-small); transition: color .2s; }
+.contact-direct .k { display: inline-flex; align-items: center; gap: 10px; color: var(--inv-soft); transition: color .2s; }
+/* пошта — довгий нерозривний рядок: на вузькому екрані розпирав секцію */
+.contact-direct .v { color: var(--inv); transition: color .2s; overflow-wrap: anywhere; }
+/* іконка каналу — біла на повну */
+.contact-direct .ci { width: 17px; height: 17px; flex: none; color: var(--inv); transition: color .2s; }
+/* фірмовий знак Viber — суцільна форма, і малюнок щільніше заповнює свій
+   квадрат, ніж лінійні іконки поруч. На піксель менший, щоб у рядку він
+   не був важчим за Telegram і телефон */
+.contact-direct .ci--brand { width: 16px; height: 16px; }
+/* на ховері рожевіє весь рядок цілком — іконка, назва і значення разом */
+.contact-direct a:hover .k,
+.contact-direct a:hover .v,
+.contact-direct a:hover .ci { color: var(--signal); }
+
+.form { background: var(--paper); color: var(--tx); border-radius: var(--r-card); padding: clamp(24px, 3vw, 36px); }
+.term-line { display: flex; align-items: center; gap: 10px; border: 1px solid var(--ink); border-radius: var(--r-card); padding: 4px 4px 4px 16px; margin-bottom: 14px; transition: border-color .2s; }
+.term-line:focus-within { border-color: var(--signal); }
+.term-line .pr { font-family: var(--f-body); color: var(--signal); font-size: var(--fs-ui); }
+.term-line input { flex: 1; min-width: 0; border: none; background: none; font: inherit; font-family: var(--f-body); font-size: var(--fs-ui); padding: 14px 0; color: var(--tx); outline: none; }
+.field { margin-bottom: 14px; }
+.field label { font-family: var(--f-body); font-size: var(--fs-meta); letter-spacing: var(--ls-meta); color: var(--tx-mute); display: block; margin-bottom: 8px; }
+.field label .opt { text-transform: none; letter-spacing: 0; }
+.field label .req { color: var(--signal); font-weight: var(--fw-bold); margin-left: 2px; }
+.field > input { width: 100%; padding: 14px 16px; font: inherit; font-size: var(--fs-small); background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r-card); color: var(--tx); transition: border-color .2s; }
+.field > input:focus { outline: none; border-color: var(--signal); }
+.field > input[aria-invalid="true"] { border-color: var(--signal); }
+.term-line input[aria-invalid="true"] { color: var(--signal); }
+.err { color: var(--signal); font-family: var(--f-body); font-size: var(--fs-meta); margin-top: 6px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+/* необовʼязковий вибір напряму: чіпи, а не селект — обидві програми видно
+   одразу, і вибір ставиться одним дотиком з картки програми */
+.field--choice .lbl { display: block; margin-bottom: 8px; font-family: var(--f-body); font-size: var(--fs-meta); letter-spacing: var(--ls-meta); color: var(--tx-mute); }
+.field--choice .lbl .opt { opacity: .6; }
+/* чіпи однакової ширини на всю колонку форми: у flex «Карʼєра в таргеті»
+   виходила помітно вужчою за сусідку — просто бо напис коротший.
+   auto-fit складає їх у стовпчик, коли форма стає вузькою */
+.choice { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
+.choice input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.choice label { display: flex; flex-direction: column; gap: 3px; margin: 0; padding: 11px 15px; border: 1px solid var(--line-2); border-radius: var(--r-card); font-family: var(--f-body); font-size: var(--fs-ui); letter-spacing: 0; color: var(--tx); cursor: pointer; transition: border-color .2s var(--ease), background .2s var(--ease); }
+.choice label span { font-size: var(--fs-meta); color: var(--tx-mute); }
+.choice label:hover { border-color: var(--signal); }
+.choice input:checked + label { border-color: var(--signal); background: color-mix(in srgb, var(--signal) 8%, transparent); }
+.choice input:checked + label span { color: var(--signal); opacity: 1; }
+.choice input:focus-visible + label { border-color: var(--signal); box-shadow: var(--flare); }
+.choice-clear { margin-top: 10px; font-family: var(--f-body); font-size: var(--fs-meta); color: var(--tx-mute); text-decoration: underline; text-underline-offset: 3px; }
+.choice-clear:hover { opacity: 1; color: var(--signal); }
+.form .btn { width: 100%; justify-content: center; margin-top: 6px; }
+.form-success { display: none; text-align: center; padding: 30px 6px; }
+.form-success.show { display: block; }
+.form-success .big { font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-h3); color: var(--signal); margin-bottom: 10px; }
+.form-success p { color: var(--tx-soft); }
+
+/* =================================================================
+   FOOTER
+   ================================================================= */
+.site-footer { background: var(--ink); color: var(--inv-soft); padding-block: 0 32px; }
+/* контакти й підвал — обидва темні й зливались в одну пляму з провалом
+   посередині. Волосинка по ширині колонки ділить їх, а відступ контактів
+   знизу скорочено, щоб підвал не висів у порожнечі */
+.site-footer > .wrap { position: relative; padding-top: 56px; }
+.site-footer > .wrap::before { content: ""; position: absolute; top: 0; left: var(--gutter); right: var(--gutter); height: 1px; background: var(--inv-line); }
+.contact { padding-bottom: clamp(64px, 8vw, 110px); }
+.foot-top { display: flex; justify-content: space-between; gap: 40px; flex-wrap: wrap; padding-bottom: 34px; }
+.foot-brand { max-width: 300px; }
+.foot-brand .brand { color: var(--inv); font-size: calc(var(--fs-logo) * 1.2); margin-bottom: 12px; display: inline-block; }
+/* опис під логотипом — приглушений сірий: підпис, а не заголовок */
+.foot-brand p { font-size: var(--fs-small); line-height: var(--lh-body); color: var(--inv-mute); }
+.foot-cols { display: flex; gap: clamp(36px, 6vw, 80px); flex-wrap: wrap; }
+.foot-col h4 { font-family: var(--f-body); font-size: var(--fs-caps); text-transform: uppercase; letter-spacing: var(--ls-caps); color: var(--signal); margin-bottom: 14px; font-weight: var(--fw-bold); }
+.foot-col a { display: block; font-family: var(--f-body); font-size: var(--fs-ui); color: var(--inv-soft); padding: 5px 0; transition: color .2s; }
+.foot-col a:hover { color: var(--inv); }
+/* Академія — той самий рожевий, що й у меню: єдиний кольоровий пункт підвалу,
+   колір не змінюється й на наведенні */
+.foot-col a[href$="academy.html"] { color: var(--signal); }
+.foot-bottom { padding-top: 26px; font-family: var(--f-body); font-size: var(--fs-meta); color: var(--tx-mute); }
+
+/* sticky mobile CTA */
+.sticky-cta { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 90; display: none; transform: translateY(150%); transition: transform .4s var(--ease); }
+.sticky-cta.show { transform: translateY(0); }
+.sticky-cta .btn { width: 100%; justify-content: center; }
+
+/* один-єдиний reveal (герой) */
+.fade { opacity: 0; transform: translateY(16px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+.fade.in { opacity: 1; transform: none; }
+
+/* поява секцій при скролі — блок «доїжджає», а не виникає ривком.
+   Спрацьовує один раз: повторний прохід сторінкою вже не мерехтить */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--ease-expo), transform .7s var(--ease-expo); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* симптоми злитого бюджету — по черзі, а не всі троє разом.
+   Паузу між картками ставить скрипт (transition-delay), бо вона залежить
+   від їхньої кількості, а не від порядку в розмітці */
+.pain-row.reveal { transition-duration: .8s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fade, .reveal { opacity: 1; transform: none; transition: none; }
+  .media img, .directory a { transition: none; }
+}
+
+/* =================================================================
+   МОТИВИ З TRUSTLY — див. assets/js/anim.js
+   ================================================================= */
+
+/* Літери виїжджають з-під рядка. Слово ріже все, що нижче базової лінії,
+   тому знизу лишаємо запас на хвости «у», «р», «д» — і тут-таки віднімаємо
+   його марджином, щоб міжрядковий інтервал не поїхав */
+/* nowrap обовʼязковий: літери всередині слова — окремі inline-block, а між
+   ними браузер має право переносити рядок. Без цього «недозаробляєте»
+   розривалось посеред слова на вузькому екрані */
+/* ріжемо тільки по вертикалі: Unbounded із відʼємним трекінгом виступає
+   чорнилом за правий край інлайнового боксу, і суцільний clip зрізав щоку
+   останньої літери слова */
+.split-ready .word { display: inline-block; white-space: nowrap; overflow: visible clip; padding-bottom: .16em; margin-bottom: -.16em; }
+.split-ready .char { display: inline-block; transform: translateY(120%); transition: transform 1s var(--ease-expo); }
+.split-ready.is-in .char { transform: none; }
+
+/* Слова абзаца доходять до повної непрозорості за скролом. Стартове значення
+   ставить JS; тут лише inline-block, без якого opacity нема на чому тримати */
+.scrub-ready .word { display: inline-block; }
+
+/* Кругла кнопка з trustly.com, але без їхнього розкриття в пігулку: підпис
+   у ній дублював рядок «Розбір кейсу» під карткою. Лишилося коло зі стрілкою
+   навскіс, яке на hover картки трохи підростає */
+.circle-arrow {
+  position: absolute; right: 12px; bottom: 12px; z-index: 1;
+  display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--signal); color: var(--white);
+  transition: transform .3s var(--ease-expo);
+}
+/* стрілка коса — те саме «перейти», що й у решті картки */
+.circle-arrow .ca-arr { font-size: var(--fs-ui); line-height: 1; transform: rotate(-45deg); }
+.ccard:hover .circle-arrow, .ccard:focus-visible .circle-arrow { transform: scale(1.1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .circle-arrow { transition: none; }
+  .ccard:hover .circle-arrow, .ccard:focus-visible .circle-arrow { transform: none; }
+}
+
+/* =================================================================
+   RESPONSIVE
+   ================================================================= */
+@media (max-width: 1000px) {
+  .nums { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tst-more, .programs { grid-template-columns: 1fr; }
+  .hero-top { grid-template-columns: 1fr; gap: 32px; }
+  .hero-band { grid-template-columns: 1fr; gap: 32px; }
+  .hero-data { text-align: left; } .hero-data .row { justify-content: flex-start; }
+  .hero-media { aspect-ratio: 16/9; }
+  .svc-majors { grid-template-columns: 1fr; }
+  .svc-grid { grid-template-columns: 1fr; }
+  /* каталог під текстом і в одну колонку: у двох він стискався до трьох слів */
+  .svc-layout { grid-template-columns: 1fr; }
+  .svc-head .h2 { max-width: none; }
+  .svc-lead { max-width: 60ch; }
+  .svc-accordion { grid-template-columns: 1fr; margin-top: 32px; }
+  /* друга колонка стає продовженням першої — своя верхня лінійка їй уже не потрібна */
+  .svc-col + .svc-col { border-top: none; }
+  .ccards-grid { grid-template-columns: repeat(2, 1fr); }
+  .founder-facts { grid-template-columns: repeat(2, 1fr); }
+  .cc-two { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: repeat(2, 1fr); }
+  .founder-grid { grid-template-columns: 1fr; }
+  .founder-photo .media { aspect-ratio: 4/3; max-height: 460px; }
+  .quote-sec blockquote { max-width: none; }
+  .faq-layout { grid-template-columns: 1fr; gap: 26px; }
+  .faq-aside { position: static; }
+  .pain-list { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+}
+/* Unbounded широкий: у вузькій картці «Допомагаємо» не влазало в рядок
+   і розривалося посеред слова, бо кожна літера — окремий inline-block */
+@media (max-width: 560px) {
+  .nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* картка вужча за екран — з-за краю визирає наступна, видно що є куди гортати */
+  .gal--cases .gal-track > * { width: min(330px, 80vw); }
+}
+
+@media (max-width: 700px) {
+  :root { --fs-body: 17px; }
+  .nav-links, .nav-actions .btn { display: none; }
+  .nav-toggle { display: flex; }
+  /* меню на весь екран: пункти з мono-нумерацією як у кейсах, знизу — CTA
+     і контакти, щоб порожнє поле під чотирма лінками не пустувало */
+  .nav-links.mobile-open { display: flex; flex-direction: column; position: fixed; inset: 70px 0 0; background: var(--paper); padding: 10px var(--gutter) calc(26px + env(safe-area-inset-bottom, 0px)); gap: 0; z-index: 99; overflow-y: auto; counter-reset: navi; animation: navPanel .22s var(--ease) both; }
+  /* border-radius: 0 обовʼязково — базові 100px вигинали нижню лінію дугою */
+  .nav-links.mobile-open a { display: flex; align-items: baseline; gap: 14px; border-radius: 0; font-family: var(--f-display); font-size: var(--fs-h3); padding: 17px 0; border-bottom: 1px solid var(--line); color: var(--tx); animation: navItem .34s var(--ease-expo) both; }
+  .nav-links.mobile-open a::before { counter-increment: navi; content: counter(navi, decimal-leading-zero); font-family: var(--f-body); font-size: var(--fs-meta); font-weight: var(--fw-ui); letter-spacing: var(--ls-meta); color: var(--signal); }
+  .nav-links.mobile-open a[href$="academy.html"] { color: var(--signal); }
+  .nav-links.mobile-open a:not(.btn):not([href$="academy.html"])[aria-current="page"] { color: var(--tx); }
+  .nav-links.mobile-open a:nth-child(1) { animation-delay: .03s; }
+  .nav-links.mobile-open a:nth-child(2) { animation-delay: .08s; }
+  .nav-links.mobile-open a:nth-child(3) { animation-delay: .13s; }
+  .nav-links.mobile-open a:nth-child(4) { animation-delay: .18s; }
+  .nav-links.mobile-open .nav-cta { display: flex; justify-content: center; border-radius: var(--r-cta); margin-top: auto; padding: 16px 22px; font-size: var(--fs-small); border-bottom: 0; color: var(--white); animation-delay: .23s; }
+  .nav-links.mobile-open .nav-cta::before { content: none; }
+  .nav-links.mobile-open .nav-contacts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 16px; animation: navItem .34s var(--ease-expo) .28s both; }
+  .nav-links.mobile-open .nav-contacts a { font-family: var(--f-body); font-size: var(--fs-ui); padding: 0; border-bottom: 0; color: var(--tx-soft); animation: none; }
+  .nav-links.mobile-open .nav-contacts a::before { content: none; }
+  @keyframes navPanel { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes navItem { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-links.mobile-open, .nav-links.mobile-open a, .nav-links.mobile-open .nav-contacts { animation: none; }
+  }
+  /* дві картки програм — це п'ять екранів суцільних списків. На телефоні
+     лишаємо видимими назву й опис, решту розгортаємо на дотик */
+  .prog-toggle { display: grid; grid-template-columns: 1fr 16px; align-items: center; gap: 16px; width: 100%; margin-top: 20px; padding: 16px 0 0; border-top: 1px solid var(--line); text-align: left; font-family: var(--f-body); font-size: var(--fs-ui); font-weight: var(--fw-ui); color: var(--signal); }
+  .prog-toggle .qa-ic { justify-self: end; }
+  .prog-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s var(--ease-expo); }
+  .prog-body > div { display: block; overflow: hidden; }
+  .program.open .prog-body { grid-template-rows: 1fr; }
+  .prog-body .prog-block:first-child { padding-top: 22px; }
+  .program .prog-result { margin-bottom: 24px; }
+  .steps { grid-template-columns: 1fr; }
+  .ccards-grid { grid-template-columns: 1fr; }
+  .hero-data .row { white-space: normal; }
+  .sticky-cta { display: block; }
+
+  /* послуги: на 335px відступи з'їдали третину рядка, і опис ставав вузькою
+     колонкою в тринадцять символів. Номер тонший, опис — на всю ширину */
+  .svc-row { grid-template-columns: 30px 1fr 30px; gap: 10px; padding: 16px 0; }
+  .svc-row:hover .no, .svc-row:hover .nm { transform: none; }
+  .svc-row .nm { line-height: var(--lh-title); }
+  .svc-desc-inner { padding: 0 0 18px 40px; }
+
+  .contact-direct a { grid-template-columns: 112px minmax(0, 1fr); }
+  .kpi { text-align: left; }
+  /* у два стовпці плитка стискається до 160px — облич не розібрати */
+  /* на телефоні плитка стискається до самого кадру: порожні поля згори й
+     знизу там тільки з'їдають екран */
+  .vids { grid-template-columns: 1fr; }
+}
+
+/* світлі секції підряд на головній: два повні падінги давали
+   порожній екран між блоками */
+#cases { padding-top: clamp(40px, 5vw, 72px); }
+/* між послугами й кейсами було ~400px порожнечі — більше, ніж будь-де */
+#services { padding-bottom: clamp(40px, 5vw, 72px); }
+#founder { padding-bottom: clamp(24px, 3vw, 40px); }
+#faq { padding-top: clamp(40px, 5vw, 72px); }
+
+/* =================================================================
+   ДОВГІ ПЕРЕЛІКИ В КЕЙСАХ — дві колонки на широкому екрані
+   ================================================================= */
+/* «Що зробили» з пʼяти й більше пунктів займав вузьку смугу ліворуч, а
+   праворуч лишалася порожня половина сторінки. Колонки, а не грід: так
+   пункти читаються згори вниз, а не змійкою. Списки на 3–4 пункти лишаємо
+   в один стовпчик — у двох вони розсипаються */
+@media (min-width: 1001px) {
+  .cpanel--page .cc-block > .cc-list:has(li:nth-child(5)) {
+    display: block; max-width: none;
+    columns: 2; column-gap: clamp(28px, 3.4vw, 56px);
+  }
+  .cpanel--page .cc-block > .cc-list:has(li:nth-child(5)) li {
+    break-inside: avoid;
+    margin-bottom: 9px;
+  }
+}
+
+/* =================================================================
+   ТЕКСТОВІ ВСТАВКИ — дві ролі на весь сайт
+   ================================================================= */
+/* Абзаци жили кожен за своїми правилами: 16, 17, 18, 19px і різний сірий.
+   Тепер ролей дві — вступ і дрібний текст — і обидві беруть --tx-soft */
+
+/* 1 — вступ біля заголовка секції */
+.svc-lead,
+.founder-txt p,
+.academy p,
+.contact-intro,
+.hero-right--flush .lead,
+.program > p,
+.cc-two p,
+.cpanel--page .cc-block > p {
+  font-size: var(--fs-body); line-height: var(--lh-body); font-weight: var(--fw-text);
+  color: var(--tx-soft); opacity: 1; max-width: 48ch;
+}
+.contact-intro { color: var(--inv-soft); }
+/* відступ від заголовка до абзацу — один на всі секції */
+.founder-txt h2, .contact h2 { margin-bottom: 0; }
+.svc-lead, .founder-txt h2 + p, .contact-intro { margin-top: 20px; }
+.academy p { margin-top: 14px; }
+
+/* 2 — дрібний текст у картках, згортаннях і списках */
+.pain-row p,
+.svc-desc-inner,
+.qa-a p,
+.ccard .ttl,
+.cc-list li,
+.road-list li {
+  font-size: var(--fs-small); line-height: var(--lh-body); color: var(--tx-soft); opacity: 1;
+}
+.pain-row p { color: var(--inv-soft); }
+.qa-a p { max-width: 56ch; }
+
+/* =================================================================
+   ЛІНІЇ — лишаємо тільки там, де вони відділяють клікабельні рядки
+   ================================================================= */
+/* контакти й перехід до наступного кейсу тримаються на відступах */
+.contact-direct { gap: 4px; }
+.contact-direct a { border-bottom: none; padding: 12px 2px; }
+.case-nav { border-top: none; }
+/* у згортаннях лінія потрібна — вона показує межу пункту, — але ледь чутна */
+.svc-col, .svc-item, .faq-list, .qa { border-color: color-mix(in srgb, var(--ink) 8%, transparent); }
+
+/* =================================================================
+   ДРІБНІ ВИРІВНЮВАННЯ НА ШИРОКОМУ ЕКРАНІ
+   ================================================================= */
+@media (min-width: 701px) {
+  /* Академія: кнопка стоїть під абзацом, а не відірвано біля правого краю */
+  .academy { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: clamp(28px, 4vw, 56px); row-gap: 24px; align-items: center; justify-content: start; }
+  .academy-ava { grid-row: span 2; }
+  .academy-txt { align-self: end; }
+  .academy .btn { justify-self: start; align-self: start; }
+  /* назва кейсу тримає висоту двох рядків — описи в сусідніх картках
+     стартують з однієї лінії, а не стрибають за довжиною назви */
+  .ccard .nm { min-height: 2.3em; }
+}
+@media (min-width: 1001px) {
+  /* симптоми: заголовки в два й три рядки — тексти під ними тепер стартують
+     з однієї лінії в усіх трьох картках */
+  .pain-row h3 { min-height: 3.3em; }
+}

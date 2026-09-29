@@ -215,13 +215,8 @@ function setup() {
   if (oldFilter) oldFilter.remove();
   sheet.getRange(1, 1, totalRows, width).createFilter();
 
+  regroupTechColumns_(sheet, layout, width);
   if (fresh) {
-    // службові колонки — у згорнутій групі («+» над літерами колонок)
-    var firstTech = layout[COLUMNS.filter(function (c) { return c.tech; })[0].key];
-    var techRange = sheet.getRange(1, firstTech, 1, width - firstTech + 1);
-    try { if (!sheet.getColumnGroup(firstTech, 1)) techRange.shiftColumnGroupDepth(1); } catch (e) { techRange.shiftColumnGroupDepth(1); }
-    sheet.setColumnGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
-    try { sheet.getColumnGroup(firstTech, 1).collapse(); } catch (e2) { /* вже згорнуто */ }
     // зайві колонки праворуч і рядки знизу прибираємо — чиста таблиця
     if (sheet.getMaxColumns() > width) sheet.deleteColumns(width + 1, sheet.getMaxColumns() - width);
     if (sheet.getMaxRows() > MAX_ROWS + 1) sheet.deleteRows(MAX_ROWS + 2, sheet.getMaxRows() - MAX_ROWS - 1);
@@ -247,6 +242,29 @@ function setup() {
   }
   ss.toast('Оформлення готове.' + (created ? ' Секрет створено — меню marketingpro → «Показати секрет».' : ''), 'marketingpro', 8);
   if (created) showSecret();
+}
+
+/**
+ * Службові колонки — у згорнутій групі («+» над літерами колонок). Стару групу (з попередньої розкладки) спершу знімаємо,
+ * інакше вона ховала б не ті колонки. Якщо службові колонки розкидані (користувач їх переставив), не групуємо.
+ */
+function regroupTechColumns_(sheet, layout, width) {
+  try {
+    try { sheet.expandAllColumnGroups(); } catch (e0) { /* груп нема */ }
+    for (var c = 1; c <= width; c++) {
+      var guard = 0;
+      while (sheet.getColumnGroupDepth(c) > 0 && guard++ < 8) sheet.getRange(1, c).shiftColumnGroupDepth(-1);
+    }
+    sheet.showColumns(1, width);
+    var techCols = COLUMNS.filter(function (x) { return x.tech; }).map(function (x) { return layout[x.key]; });
+    var first = Math.min.apply(null, techCols), last = Math.max.apply(null, techCols);
+    if (last - first + 1 !== techCols.length) return;
+    sheet.getRange(1, first, 1, last - first + 1).shiftColumnGroupDepth(1);
+    sheet.setColumnGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
+    sheet.getColumnGroup(first, 1).collapse();
+  } catch (e) {
+    console.warn('Групування службових колонок не виконано: ' + e);
+  }
 }
 
 /** Кнопка меню: повертає стандартні кольори, список статусів, ширини й заголовки. Заявки й порядок колонок не чіпає. */

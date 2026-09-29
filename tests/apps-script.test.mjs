@@ -22,14 +22,17 @@ class Range{
   getA1Notation(){return 'A'+this.r}
   createTextFinder(t){const self=this;return {matchEntireCell(){return this},findNext(){for(let i=0;i<self.nr;i++)for(let j=0;j<self.nc;j++){if(String(self.sh.cells.get(`${self.r+i},${self.c+j}`)??'')===t) return new Range(self.sh,self.r+i,self.c+j)} return null}}}
   addDeveloperMetadata(key,val){ if(this.nc!==1) throw new Error('only whole column'); this.sh.meta.push({key,value:val,type:'COLUMN',col:this.c,sheet:this.sh}); return this }
+  shiftColumnGroupDepth(d){ for(let c=this.c;c<this.c+this.nc;c++) this.sh.depth[c]=Math.max(0,(this.sh.depth[c]||0)+d); return this }
   setRichTextValues(v){ v.forEach((row,i)=>row.forEach((_x,j)=>this.sh.rich.push({r:this.r+i,c:this.c+j,v:this.sh.cells.get(`${this.r+i},${this.c+j}`)}))); return this }
   setRichTextValue(){ this.sh.rich.push({r:this.r,c:this.c,v:this.sh.cells.get(`${this.r},${this.c}`)}); return this }
   sort({column,ascending}){ /* сортуємо рядки діапазону за колонкою */ const rows=[];for(let i=0;i<this.nr;i++){const row=[];for(let j=0;j<this.nc;j++)row.push(this.sh.cells.get(`${this.r+i},${this.c+j}`)??'');rows.push(row)}
     const k=column-this.c; rows.sort((a,b)=>(a[k]<b[k]?-1:a[k]>b[k]?1:0)*(ascending?1:-1)); rows.forEach((row,i)=>row.forEach((x,j)=>this.sh.cells.set(`${this.r+i},${this.c+j}`,x))); return this }
 }
 class Sheet{
-  constructor(ss,name){this.ss=ss;this.name=name;this.cells=new Map();this.meta=[];this.rich=[];this.maxRows=1000;this.maxCols=26;
+  constructor(ss,name){this.ss=ss;this.name=name;this.cells=new Map();this.meta=[];this.rich=[];this.depth={};this.collapsedFrom=null;this.maxRows=1000;this.maxCols=26;
     const px=new Proxy(this,{get:(t,p)=>{ if(p in t) return t[p]; if(typeof p==='symbol') return undefined; return (..._a)=>new Range(px,1,1); }}); return px; }
+  getColumnGroupDepth(c){return this.depth[c]||0}
+  getColumnGroup(col){return {collapse:()=>{this.collapsedFrom=col}}}
   getName(){return this.name} setName(n){this.name=n;return this} getParent(){return this.ss}
   getRange(r,c,nr,nc){return new Range(this,r,c,nr??1,nc??1)}
   getLastRow(){let m=0;for(const [k,v] of this.cells) if(v!==''&&v!==null){m=Math.max(m,+k.split(',')[0])}return m}
@@ -173,4 +176,21 @@ test("Google-сумісність графіків: без опцій, які р
   for (const a of area) assert.ok(!/right|bottom/.test(a), `chartArea має лише left/top, а знайдено: ${a}`);
   for (const bad of ["showTextEvery", "groupWidth"]) assert.ok(!charts.includes(bad), `недопустима опція ${bad}`);
   assert.ok(charts.includes("try {") && charts.includes("catch (e)"), "графіки мають будуватись у try/catch");
+});
+
+test("група службових колонок: стара група зі старого місця знімається, ховаються лише службові колонки", () => {
+  const env = makeEnv("uk");
+  env.run("setup()");
+  const sheet = env.leads();
+  const colOf = (k) => sheet.meta.find((m) => m.key === "mp_col" && m.value === k).col;
+  const lastVisible = Math.max(...JSON.parse(env.run("JSON.stringify(COLUMNS.filter(function (c) { return !c.tech; }).map(function (c) { return c.key; }))")).map(colOf));
+  const firstTech = colOf("id");
+  assert.equal(firstTech, lastVisible + 1, "службові колонки йдуть відразу після видимих");
+  // імітуємо стару групу з попередньої розкладки (починалась із 13-ї колонки, тобто ховала видимі)
+  for (let c = 13; c <= 42; c++) sheet.depth[c] = 1;
+  sheet.collapsedFrom = 13;
+  env.run("resetFormatting()");
+  for (let c = 1; c <= lastVisible; c++) assert.equal(sheet.depth[c] || 0, 0, `видима колонка ${c} не має бути в групі`);
+  for (let c = firstTech; c <= 42; c++) assert.equal(sheet.depth[c], 1, `службова колонка ${c} має бути в групі`);
+  assert.equal(sheet.collapsedFrom, firstTech);
 });

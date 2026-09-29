@@ -40,11 +40,11 @@ var COLUMNS = [
   { key: 'createdAt', title: 'Дата і час', width: 135, kind: 'date' },
   { key: 'status', title: 'Статус', width: 115, kind: 'status' },
   { key: 'type', title: 'Тип', width: 120 },
-  { key: 'program', title: 'Курс', width: 220 },
-  { key: 'name', title: 'Ім’я', width: 150 },
-  { key: 'contact', title: 'Телефон / Telegram', width: 175, kind: 'contact' },
-  { key: 'link', title: 'Instagram / сайт', width: 220, kind: 'link' },
-  { key: 'niche', title: 'Ніша', width: 180 },
+  { key: 'program', title: 'Цікавить навчання?', width: 230 },
+  { key: 'name', title: 'Імʼя', width: 150 },
+  { key: 'contact', title: 'Телефон або Telegram для звʼязку', width: 230, kind: 'contact' },
+  { key: 'link', title: 'Лінк на Instagram або сайт', width: 230, kind: 'link' },
+  { key: 'niche', title: 'Ніша бізнесу', width: 190 },
   { key: 'quality', title: 'Заповненість', width: 120 },
   { key: 'source', title: 'Джерело', width: 170 },
   { key: 'campaign', title: 'Кампанія', width: 170 },
@@ -126,7 +126,7 @@ function setup() {
   var header = sheet.getRange(1, 1, 1, n);
   header.setValues([COLUMNS.map(function (c) { return c.title; })])
     .setFontWeight('bold').setFontSize(10).setFontColor('#FFFFFF').setHorizontalAlignment('left')
-    .setBackground(INK);
+    .setBackground(INK).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
   sheet.setRowHeight(1, HEADER_HEIGHT);
   COLUMNS.forEach(function (c, i) {
     var col = i + 1;
@@ -315,7 +315,7 @@ function buildStats_(ss) {
   var blocks = [
     { title: 'За джерелами', row: 39, col: 1, key: 'source', label: 'Джерело' },
     { title: 'За кампаніями', row: 39, col: 5, key: 'campaign', label: 'Кампанія' },
-    { title: 'За курсами академії', row: 39, col: 9, key: 'program', label: 'Курс' },
+    { title: 'За курсами академії', row: 39, col: 9, key: 'program', label: 'Навчання' },
     { title: 'За сторінками з формою', row: 56, col: 1, key: 'pageLabel', label: 'Сторінка' },
     { title: 'За типом заявки', row: 56, col: 5, key: 'type', label: 'Тип' },
     { title: 'За днями (останні 14)', row: 56, col: 9, key: 'day', label: 'День', days: true }

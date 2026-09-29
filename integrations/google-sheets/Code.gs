@@ -91,6 +91,7 @@ function onOpen() {
     .addItem('Нові зверху (відсортувати)', 'sortNewestFirst')
     .addItem('Показати секрет для сайту', 'showSecret')
     .addItem('Додати тестову заявку', 'addTestLead')
+    .addItem('Видалити тестові заявки', 'deleteTestLeads')
     .addToUi();
 }
 
@@ -342,6 +343,37 @@ function buildStats_(ss) {
   });
   sh.setFrozenRows(2);
   return sh;
+}
+
+/**
+ * Видаляє тестові заявки: ті, що додані меню «Додати тестову заявку» / перевірками вебхука
+ * (ID починається з TEST або джерело = test). Справжні заявки не чіпає.
+ */
+function deleteTestLeads() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME);
+  var ui = SpreadsheetApp.getUi();
+  var last = sheet ? sheet.getLastRow() : 0;
+  if (last < 2) { ui.alert('Заявок ще немає.'); return; }
+
+  var ids = sheet.getRange(2, colIndex_('id'), last - 1, 1).getValues();
+  var sources = sheet.getRange(2, colIndex_('source'), last - 1, 1).getValues();
+  var rows = [];
+  for (var i = 0; i < ids.length; i++) {
+    if (/^TEST/i.test(String(ids[i][0])) || String(sources[i][0]).toLowerCase() === 'test') rows.push(i + 2);
+  }
+  if (!rows.length) { ui.alert('Тестових заявок не знайдено.'); return; }
+  if (ui.alert('Видалити тестові заявки', 'Знайдено ' + rows.length + ' шт. Видалити їх безповоротно?', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    for (var j = rows.length - 1; j >= 0; j--) sheet.deleteRow(rows[j]); // знизу вгору, щоб номери не зсувались
+    setup(); // повертає таблиці повний розмір оформлення й перераховує «Аналітику»
+  } finally {
+    lock.releaseLock();
+  }
+  ss.toast('Видалено тестових заявок: ' + rows.length, 'marketingpro', 6);
 }
 
 /* ------------------------------------------------------------------ *

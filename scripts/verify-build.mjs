@@ -34,10 +34,14 @@ for (const [route, file] of routes) {
   const h1s = html.match(/<h1[\s>]/g) || [];
 
   if (!title || title.length < 10) fail(route, "порожній або надто короткий <title>");
+  if (title && title.length > 100) fail(route, `надто довгий <title> (${title.length} символів): ${title.slice(0, 60)}…`);
   if (!desc || desc.length < 50) fail(route, "порожній або надто короткий meta description");
   if (!canonical) fail(route, "немає canonical");
   else if (!canonical.startsWith("https://") || canonical.endsWith(".html")) fail(route, `некоректний canonical: ${canonical}`);
   if (!/<meta property="og:title"/.test(html) || !/<meta property="og:image"/.test(html)) fail(route, "немає og:title/og:image");
+  const ogImg = pick(/<meta property="og:image" content="https:\/\/[^/]+(\/[^"]+)"/);
+  if (!ogImg) fail(route, "og:image має бути абсолютним https-URL");
+  else if (ogImg.startsWith("/og/") && !fs.existsSync(path.join(root, ogImg + ".body"))) fail(route, `не згенеровано превʼю ${ogImg}`);
   if (!/<html lang="uk"/.test(html)) fail(route, "немає lang=uk");
   if (h1s.length !== 1) fail(route, `має бути рівно один <h1>, знайдено ${h1s.length}`);
   if (/noindex/i.test(html)) fail(route, "знайдено noindex");

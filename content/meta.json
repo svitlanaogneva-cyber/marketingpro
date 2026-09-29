@@ -4,7 +4,7 @@
       "title": "marketingpro — таргетована реклама в Meta Ads, що рахує ваші гроші",
       "description": "Агенція таргетованої реклами. Купуємо лідів у Meta Ads дешевше за конкурентів: будуємо воронки, які приносять підтверджені продажі, а не лайки й охоплення. Безкоштовний аудит рекламного кабінету.",
       "canonical": "https://marketingpro.company/",
-      "ogImage": "https://marketingpro.company/assets/og-image.jpg",
+      "ogImage": "https://marketingpro.company/og/home.png",
       "ogType": "website",
       "ld": [
         {
@@ -30,7 +30,7 @@
       "title": "Академія таргетованої реклами — marketingpro | навчання Meta Ads на кейсах",
       "description": "Навчання таргетованій рекламі в Meta Ads на реальних кейсах. Два напрями: для власників бізнесу (5 тижнів) і для тих, хто будує карʼєру таргетолога (10 тижнів).",
       "canonical": "https://marketingpro.company/academy",
-      "ogImage": "https://marketingpro.company/assets/og-image.jpg",
+      "ogImage": "https://marketingpro.company/og/academy.png",
       "ogType": "website",
       "ld": []
     },
@@ -38,7 +38,7 @@
       "title": "Кейси — marketingpro | результати таргетованої реклами в Meta Ads",
       "description": "Кейси агенції marketingpro: реальні цифри з рекламних кабінетів — меблі, одяг, школа мов, e-commerce, стоматологія, бьюті, фітнес. ROAS, вартість клієнта, дохід.",
       "canonical": "https://marketingpro.company/cases",
-      "ogImage": "https://marketingpro.company/assets/og-image.jpg",
+      "ogImage": "https://marketingpro.company/og/cases.png",
       "ogType": "website",
       "ld": []
     }
@@ -49,7 +49,7 @@
       "title": "Український бренд одягу з власним виробництвом — кейс marketingpro",
       "description": "Дохід з реклами виріс удесятеро за рік роботи. ×10 дохід · 8,75$ клієнт · 1182% roas",
       "canonical": "https://marketingpro.company/cases/apparel",
-      "ogImage": "https://marketingpro.company/assets/img/cases/apparel/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/apparel.png",
       "ogType": "article",
       "ld": [
         {
@@ -91,7 +91,7 @@
       "title": "Онлайн-магазин жіночих сумок — кейс marketingpro",
       "description": "Дохід з реклами ×7 за дев'ять місяців після невдалих запусків. 961% roas · 8,38$ клієнт · 30 961$ дохід/міс",
       "canonical": "https://marketingpro.company/cases/bags",
-      "ogImage": "https://marketingpro.company/assets/img/cases/bags/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/bags.png",
       "ogType": "article",
       "ld": [
         {
@@ -133,7 +133,7 @@
       "title": "Студія краси повного циклу — кейс marketingpro",
       "description": "Графік майстрів заповнений без «порожніх» днів. 829% roas · 8,2$ клієнт · 9 650$ дохід/міс",
       "canonical": "https://marketingpro.company/cases/beauty",
-      "ogImage": "https://marketingpro.company/assets/img/cases/beauty/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/beauty.png",
       "ogType": "article",
       "ld": [
         {
@@ -175,7 +175,7 @@
       "title": "Стоматологічна клініка — кейс marketingpro",
       "description": "За два місяці дохід клініки з реклами зріс утричі. ×3 дохід · 27,5$ пацієнт · 869% roas",
       "canonical": "https://marketingpro.company/cases/dental",
-      "ogImage": "https://marketingpro.company/assets/img/cases/dental/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/dental.png",
       "ogType": "article",
       "ld": [
         {
@@ -214,10 +214,10 @@
     },
     {
       "slug": "flowers",
-      "title": "Мережа магазинів квітів — кейс marketingproКвітень — 8,47$Травень — 5,92$Червень — 3,59$Липень — 2,17$Серпень — 2,84$Вересень — 3,14$Жовтень — 1,98$Листопад — 2,36$Грудень — 1,93$Квітень — 25,38$Травень — 18,91$Червень — 12,67$Липень — 7,82$Серпень — 9,41$Вересень — 5,97$Жовтень — 7,63$Листопад — 6,48$Грудень — 4,56$",
+      "title": "Мережа магазинів квітів — кейс marketingpro",
       "description": "Вартість клієнта впала в шість разів — відкрили ще два магазини. 4,28$ клієнт · 1,5$ переписка · +2 магазини",
       "canonical": "https://marketingpro.company/cases/flowers",
-      "ogImage": "https://marketingpro.company/assets/img/cases/flowers/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/flowers.png",
       "ogType": "article",
       "ld": [
         {
@@ -259,7 +259,7 @@
       "title": "Виробництво меблів — кейс marketingpro",
       "description": "167 продажів на місяць і окремий потік B2B-замовлень від дизайнерів. 2584% roas · 29$ клієнт · 125 250$ дохід/міс",
       "canonical": "https://marketingpro.company/cases/furniture",
-      "ogImage": "https://marketingpro.company/assets/img/cases/furniture/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/furniture.png",
       "ogType": "article",
       "ld": [
         {
@@ -298,7 +298,7 @@
       "title": "Запуск спортзалу з нуля — кейс marketingpro",
       "description": "Новий спортзал вийшов на ринок з готовою маркетинговою системою. 837% roas · 10,4$ клієнт · 79 клієнтів/міс",
       "canonical": "https://marketingpro.company/cases/gym",
-      "ogImage": "https://marketingpro.company/assets/img/cases/gym/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/gym.png",
       "ogType": "article",
       "ld": [
         {
@@ -340,7 +340,7 @@
       "title": "Майстер кератину — кейс marketingpro",
       "description": "Стабільний потік записів замість нерегулярних заявок. 929% roas · 7,4$ клієнт · 50 клієнтів/міс",
       "canonical": "https://marketingpro.company/cases/keratin",
-      "ogImage": "https://marketingpro.company/assets/img/cases/keratin/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/keratin.png",
       "ogType": "article",
       "ld": [
         {
@@ -379,7 +379,7 @@
       "title": "Школа іноземних мов — кейс marketingpro",
       "description": "137 нових учнів на місяць — групи заповнюються рівномірно. 1168% roas · 14,2$ учень · 137 учнів/міс",
       "canonical": "https://marketingpro.company/cases/language",
-      "ogImage": "https://marketingpro.company/assets/img/cases/language/cover.jpg",
+      "ogImage": "https://marketingpro.company/og/language.png",
       "ogType": "article",
       "ld": [
         {

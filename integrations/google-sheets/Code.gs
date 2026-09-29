@@ -37,47 +37,71 @@ var STATUSES = {
  * tech — технічні колонки: їх видно за кліком на «+» над таблицею, щоб основний вигляд лишався чистим.
  */
 var COLUMNS = [
-  { key: 'createdAt', title: 'Дата і час', width: 135, kind: 'date' },
-  { key: 'status', title: 'Статус', width: 115, kind: 'status' },
-  { key: 'type', title: 'Тип', width: 120 },
-  { key: 'program', title: 'Цікавить навчання?', width: 230 },
-  { key: 'name', title: 'Імʼя', width: 150 },
-  { key: 'contact', title: 'Телефон або Telegram для звʼязку', width: 230, kind: 'contact' },
-  { key: 'link', title: 'Лінк на Instagram або сайт', width: 230, kind: 'link' },
-  { key: 'niche', title: 'Ніша бізнесу', width: 190 },
-  { key: 'quality', title: 'Заповненість', width: 120 },
-  { key: 'source', title: 'Джерело', width: 170 },
-  { key: 'campaign', title: 'Кампанія', width: 170 },
-  { key: 'manager', title: 'Коментар менеджера', width: 280, manual: true },
+  { key: 'createdAt', title: 'Коли надійшла заявка', width: 150, kind: 'date',
+    hint: 'Дата й година, коли людина натиснула «Надіслати». Київський час.' },
+  { key: 'status', title: 'Статус', width: 120, kind: 'status',
+    hint: 'Оберіть зі списку. Новий — ще ніхто не писав. Зв’язались — вже написали/подзвонили. В роботі — йдуть перемовини. Клієнт — купили. Відмова — не підійшло. Спам — помилкова або фейкова заявка.' },
+  { key: 'type', title: 'Тип заявки', width: 130,
+    hint: 'Консультація — форма «Безкоштовна консультація» на сайті. Академія — форма на сторінці навчання.' },
+  { key: 'program', title: 'Цікавить навчання?', width: 230,
+    hint: 'Який напрям навчання людина вибрала у формі на сторінці Академії. Порожньо — не вибрала або це заявка на консультацію.' },
+  { key: 'name', title: 'Імʼя', width: 150, hint: 'Як людина себе назвала у формі.' },
+  { key: 'contact', title: 'Телефон або Telegram для звʼязку', width: 230, kind: 'contact',
+    hint: 'Єдине обовʼязкове поле форми. Якщо це Telegram-нікнейм (@нік) — на нього можна натиснути й відкрити чат.' },
+  { key: 'link', title: 'Лінк на Instagram або сайт', width: 230, kind: 'link',
+    hint: 'Посилання на бізнес людини. На нього можна натиснути й відкрити.' },
+  { key: 'niche', title: 'Ніша бізнесу', width: 190, hint: 'Чим займається бізнес — так, як людина написала у формі.' },
+  { key: 'quality', title: 'Наскільки заповнена заявка', width: 170,
+    hint: 'Повна — є імʼя, лінк і ніша. Часткова — заповнено щось одне чи два поля. Лише контакт — тільки телефон/Telegram. Зручно, щоб першими обробляти повні заявки.' },
+  { key: 'source', title: 'Звідки прийшла людина', width: 190,
+    hint: 'Головне джерело заявки: реклама Meta, Instagram, Google, Telegram, прямий візит тощо. Визначається автоматично за посиланням, з якого людина потрапила на сайт.' },
+  { key: 'campaign', title: 'З якої реклами', width: 170,
+    hint: 'Назва рекламної кампанії, якщо людина прийшла з реклами з міткою (utm_campaign). Порожньо — реклама без мітки або не з реклами.' },
+  { key: 'responsible', title: 'Відповідальний', width: 150, manual: true,
+    hint: 'Заповнюється вручну: хто з команди веде цю заявку.' },
+  { key: 'nextContact', title: 'Наступний контакт', width: 150, manual: true, kind: 'day',
+    hint: 'Заповнюється вручну: коли треба повернутися до людини (дата).' },
+  { key: 'manager', title: 'Коментар менеджера', width: 280, manual: true,
+    hint: 'Заповнюється вручну: нотатки по розмові, домовленості, причина відмови.' },
 
-  // технічні (згорнуті) — для фільтрів, звітів і розбору, звідки прийшла заявка
-  { key: 'id', title: 'ID заявки', width: 105, tech: true },
-  { key: 'day', title: 'День', width: 100, tech: true },
-  { key: 'week', title: 'Тиждень', width: 90, tech: true },
-  { key: 'month', title: 'Місяць', width: 90, tech: true },
-  { key: 'pageLabel', title: 'Сторінка з формою', width: 230, tech: true },
-  { key: 'medium', title: 'UTM medium', width: 110, tech: true },
-  { key: 'content', title: 'UTM content', width: 150, tech: true },
-  { key: 'term', title: 'UTM term', width: 130, tech: true },
-  { key: 'clickId', title: 'Click ID (fbclid/gclid)', width: 170, tech: true },
-  { key: 'referrer', title: 'Звідки прийшов', width: 220, tech: true },
-  { key: 'landing', title: 'Перша сторінка', width: 150, tech: true },
-  { key: 'casesViewed', title: 'Які кейси дивився', width: 260, tech: true },
-  { key: 'pagesViewed', title: 'Сторінок за візит', width: 120, tech: true },
-  { key: 'timeOnSite', title: 'Час на сайті', width: 110, tech: true },
-  { key: 'visit', title: 'Візит', width: 160, tech: true },
-  { key: 'firstVisit', title: 'Перший візит', width: 150, tech: true },
-  { key: 'country', title: 'Країна', width: 80, tech: true },
-  { key: 'region', title: 'Регіон', width: 90, tech: true },
-  { key: 'city', title: 'Місто', width: 120, tech: true },
-  { key: 'device', title: 'Пристрій', width: 240, tech: true },
-  { key: 'lang', title: 'Мова', width: 80, tech: true },
-  { key: 'tz', title: 'Часовий пояс', width: 140, tech: true },
-  { key: 'viewport', title: 'Екран', width: 90, tech: true },
-  { key: 'fbp', title: 'Meta _fbp', width: 170, tech: true },
-  { key: 'fbc', title: 'Meta _fbc', width: 170, tech: true },
-  { key: 'ipHash', title: 'IP (хеш)', width: 110, tech: true },
-  { key: 'ua', title: 'User-Agent', width: 320, tech: true }
+  // Далі — службові колонки (згорнуті: натисніть «+» над літерами колонок). Для фільтрів і розбору, звідки прийшла заявка.
+  { key: 'id', title: 'Номер заявки', width: 120, tech: true,
+    hint: 'Унікальний код заявки. Потрібен, щоб одну й ту саму заявку не записати двічі.' },
+  { key: 'day', title: 'Дата (для фільтра)', width: 130, tech: true, hint: 'День заявки. Зручно фільтрувати й групувати за днями.' },
+  { key: 'week', title: 'Тиждень (для фільтра)', width: 140, tech: true, hint: 'Номер тижня року. Зручно рахувати заявки за тижнями.' },
+  { key: 'month', title: 'Місяць (для фільтра)', width: 140, tech: true, hint: 'Місяць заявки. Зручно рахувати заявки за місяцями.' },
+  { key: 'pageLabel', title: 'Де заповнили форму', width: 240, tech: true,
+    hint: 'На якій сторінці сайту людина залишила заявку: головна, кейси, конкретний кейс, академія.' },
+  { key: 'page', title: 'Адреса сторінки', width: 190, tech: true, hint: 'Технічна адреса сторінки, де була форма (наприклад /cases/dental).' },
+  { key: 'medium', title: 'Тип джерела', width: 130, tech: true,
+    hint: 'Вид трафіку з мітки реклами (utm_medium): платна реклама, соцмережі, пошук, розсилка.' },
+  { key: 'content', title: 'Яке оголошення', width: 170, tech: true, hint: 'Мітка конкретного оголошення чи креативу (utm_content), якщо була.' },
+  { key: 'term', title: 'Аудиторія або ключове слово', width: 190, tech: true, hint: 'Мітка аудиторії або ключового слова (utm_term), якщо була.' },
+  { key: 'clickId', title: 'Код рекламного кліку', width: 180, tech: true,
+    hint: 'Технічний код, який реклама Meta/Google додає до посилання. Показує, що людина прийшла саме з рекламного кліку.' },
+  { key: 'referrer', title: 'З якого сайту прийшли', width: 230, tech: true, hint: 'Адреса сайту або застосунку, з якого людина перейшла на наш сайт.' },
+  { key: 'landing', title: 'З якої сторінки почали', width: 170, tech: true, hint: 'Перша сторінка, яку людина відкрила за цей візит.' },
+  { key: 'casesViewed', title: 'Переглянуті кейси', width: 270, tech: true,
+    hint: 'Які кейси людина відкривала до заявки. Показує, що її зацікавило.' },
+  { key: 'pagesViewed', title: 'Переглянуто сторінок', width: 150, tech: true, hint: 'Скільки сторінок сайту людина відкрила за цей візит.' },
+  { key: 'timeOnSite', title: 'Час на сайті до заявки', width: 170, tech: true, hint: 'Скільки минуло від початку візиту до надсилання форми.' },
+  { key: 'visit', title: 'Перший чи повторний візит', width: 190, tech: true,
+    hint: 'Чи заходила людина на сайт раніше. Повторні візити — сильніший інтерес.' },
+  { key: 'firstVisit', title: 'Перший візит на сайт', width: 160, tech: true, hint: 'Коли людина вперше зайшла на сайт (з цього браузера).' },
+  { key: 'country', title: 'Країна', width: 90, tech: true, hint: 'Визначається автоматично за адресою в інтернеті. Може бути неточною (VPN).' },
+  { key: 'region', title: 'Область / регіон', width: 130, tech: true, hint: 'Визначається автоматично. Може бути неточним.' },
+  { key: 'city', title: 'Місто', width: 130, tech: true, hint: 'Визначається автоматично. Може бути неточним.' },
+  { key: 'device', title: 'З чого зайшли (пристрій і браузер)', width: 270, tech: true,
+    hint: 'Телефон чи комп’ютер, система і браузер. Позначка «Instagram (застосунок)» означає, що людина відкрила сайт всередині Instagram.' },
+  { key: 'lang', title: 'Мова браузера', width: 120, tech: true, hint: 'Мова, налаштована в браузері людини.' },
+  { key: 'tz', title: 'Часовий пояс', width: 150, tech: true, hint: 'Часовий пояс пристрою людини. Допомагає зрозуміти, з якої країни вона.' },
+  { key: 'viewport', title: 'Розмір екрана', width: 120, tech: true, hint: 'Розмір вікна браузера в пікселях (ширина × висота).' },
+  { key: 'fbp', title: 'Технічна мітка Meta (1)', width: 190, tech: true,
+    hint: 'Потрібна лише якщо підключимо Meta Pixel / Conversions API, щоб звʼязати заявку з рекламним кліком. Зараз можна ігнорувати.' },
+  { key: 'fbc', title: 'Технічна мітка Meta (2)', width: 190, tech: true, hint: 'Те саме, що й попередня: лише для майбутнього підключення Meta Pixel.' },
+  { key: 'ipHash', title: 'Відбиток адреси (пошук спаму)', width: 190, tech: true,
+    hint: 'Зашифрований відбиток інтернет-адреси. Саму адресу ми не зберігаємо. Однакові відбитки в різних заявках — ознака спаму чи повторної заявки.' },
+  { key: 'ua', title: 'Технічний опис браузера', width: 340, tech: true, hint: 'Службовий рядок браузера. Потрібен лише розробнику для розбору проблем.' }
 ];
 
 /* ------------------------------------------------------------------ *
@@ -137,7 +161,9 @@ function setup() {
     // текстові колонки: «звичайний текст» — телефон не перетворюється на число, «=» не стає формулою
     var colRange = sheet.getRange(2, col, MAX_ROWS, 1);
     if (c.kind === 'date') colRange.setNumberFormat('dd.mm.yyyy  HH:mm');
+    else if (c.kind === 'day') colRange.setNumberFormat('dd.mm.yyyy');
     else colRange.setNumberFormat('@');
+    h.setNote(c.hint || '');
     if (c.tech) colRange.setFontColor(TECH);
     if (c.manual) colRange.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
   });
@@ -497,6 +523,7 @@ function demoLeads_(n) {
       campaign: pick(src.campaigns),
       clickId: src.click ? 'IwAR' + digits(6) : '',
       pageLabel: academy ? 'Академія' : pick(['Головна', 'Головна', 'Кейси', 'Кейс: ' + pick(cases)]),
+      page: academy ? '/academy' : pick(['/', '/', '/cases', '/cases/dental']),
       referrer: src.source === 'direct' ? '' : 'https://' + (src.source === 'meta' ? 'l.facebook.com' : src.source + '.com') + '/',
       landing: pick(['/', '/', '/cases', '/academy']),
       casesViewed: seen.join(', '),
@@ -618,6 +645,10 @@ function leadToRow_(lead) {
     if (c.key === 'day') return Utilities.formatDate(created, TIMEZONE, 'yyyy-MM-dd');
     if (c.key === 'month') return Utilities.formatDate(created, TIMEZONE, 'yyyy-MM');
     if (c.key === 'week') return isoWeek_(created);
+    if (c.key === 'firstVisit' && lead.firstVisit) {
+      var fv = new Date(lead.firstVisit);
+      if (!isNaN(fv.getTime())) return Utilities.formatDate(fv, TIMEZONE, 'dd.MM.yyyy HH:mm');
+    }
     var v = lead[c.key];
     return v === undefined || v === null ? '' : String(v);
   });

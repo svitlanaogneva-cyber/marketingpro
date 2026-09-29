@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "verify": "node scripts/verify-build.mjs",
     "ci": "npm run typecheck && npm test && npm run build && npm run verify",
-    "test": "node --experimental-strip-types --no-warnings --test tests/lead.test.ts"
+    "test": "node --experimental-strip-types --no-warnings --test tests/lead.test.ts tests/sheet-columns.test.ts"
   },
   "dependencies": {
     "next": "^16.3.7",

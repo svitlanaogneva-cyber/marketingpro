@@ -40,9 +40,9 @@ var COLUMNS = [
   { key: 'createdAt', title: 'Коли надійшла заявка', width: 150, kind: 'date',
     hint: 'Дата й година, коли людина натиснула «Надіслати». Київський час.' },
   { key: 'status', title: 'Статус', width: 120, kind: 'status',
-    hint: 'Оберіть зі списку. Новий — ще ніхто не писав. Зв’язались — вже написали/подзвонили. В роботі — йдуть перемовини. Клієнт — купили. Відмова — не підійшло. Спам — помилкова або фейкова заявка.' },
+    hint: 'Оберіть зі списку:\n• Новий — ще ніхто не писав\n• Зв’язались — вже написали або подзвонили\n• В роботі — йдуть перемовини\n• Клієнт — купили\n• Відмова — не підійшло\n• Спам — помилкова або фейкова заявка' },
   { key: 'type', title: 'Тип заявки', width: 130,
-    hint: 'Консультація — форма «Безкоштовна консультація» на сайті. Академія — форма на сторінці навчання.' },
+    hint: 'Консультація — форма «Безкоштовна консультація» на сайті.\nАкадемія — форма на сторінці навчання.' },
   { key: 'program', title: 'Цікавить навчання?', width: 230,
     hint: 'Який напрям навчання людина вибрала у формі на сторінці Академії. Порожньо — не вибрала або це заявка на консультацію.' },
   { key: 'name', title: 'Імʼя', width: 150, hint: 'Як людина себе назвала у формі.' },
@@ -52,7 +52,7 @@ var COLUMNS = [
     hint: 'Посилання на бізнес людини. На нього можна натиснути й відкрити.' },
   { key: 'niche', title: 'Ніша бізнесу', width: 190, hint: 'Чим займається бізнес — так, як людина написала у формі.' },
   { key: 'quality', title: 'Наскільки заповнена заявка', width: 170,
-    hint: 'Повна — є імʼя, лінк і ніша. Часткова — заповнено щось одне чи два поля. Лише контакт — тільки телефон/Telegram. Зручно, щоб першими обробляти повні заявки.' },
+    hint: 'Повна — є імʼя, лінк і ніша.\nЧасткова — заповнено одне чи два поля.\nЛише контакт — тільки телефон або Telegram.\nЗручно першими обробляти повні заявки.' },
   { key: 'source', title: 'Звідки прийшла людина', width: 190,
     hint: 'Головне джерело заявки: реклама Meta, Instagram, Google, Telegram, прямий візит тощо. Визначається автоматично за посиланням, з якого людина потрапила на сайт.' },
   { key: 'campaign', title: 'З якої реклами', width: 170,
@@ -111,12 +111,15 @@ var COLUMNS = [
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('marketingpro')
-    .addItem('Налаштувати / оновити оформлення', 'setup')
     .addItem('Нові зверху (відсортувати)', 'sortNewestFirst')
-    .addItem('Показати секрет для сайту', 'showSecret')
+    .addItem('Оновити аналітику й інструкцію', 'refreshDocs')
+    .addSeparator()
     .addItem('Додати тестову заявку', 'addTestLead')
     .addItem('Додати демо-дані (80 заявок)', 'seedDemoData')
     .addItem('Видалити тестові заявки', 'deleteTestLeads')
+    .addSeparator()
+    .addItem('Показати секрет для сайту', 'showSecret')
+    .addItem('Скинути оформлення до стандартного', 'resetFormatting')
     .addToUi();
 }
 
@@ -125,41 +128,53 @@ function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   ss.setSpreadsheetTimeZone(TIMEZONE);
 
-  var sheet = ss.getSheetByName(SHEET_NAME);
+  var sheet = findSheet_(ss, 'leads', SHEET_NAME);
   if (!sheet) {
     // перший аркуш (порожній «Аркуш1» / «Sheet1») перейменовуємо, якщо в ньому нічого немає
     var first = ss.getSheets()[0];
     var empty = first.getLastRow() <= 1 && first.getLastColumn() <= 1 && !first.getRange(1, 1).getValue();
     sheet = empty ? first.setName(SHEET_NAME) : ss.insertSheet(SHEET_NAME, 0);
   }
-  ss.setActiveSheet(sheet);
+  tagSheet_(sheet, 'leads');
 
-  var n = COLUMNS.length;
-  ensureSize_(sheet, MAX_ROWS + 1, n);
+  // Розкладка колонок: що вже є (за мітками) лишається на своєму місці, відсутні стандартні колонки додаються праворуч.
+  LAYOUT_ = null;
+  var existing = readTags_(sheet);
+  var fresh = Object.keys(existing).length === 0;
+  var layout = {};
+  var next = fresh ? 1 : Math.max(sheet.getLastColumn(), maxOf_(existing)) + 1;
+  COLUMNS.forEach(function (c, i) {
+    if (fresh) layout[c.key] = i + 1;
+    else if (existing[c.key]) layout[c.key] = existing[c.key];
+    else layout[c.key] = next++;
+  });
+  LAYOUT_ = layout;
+  var width = Math.max(sheet.getLastColumn(), maxOf_(layout));
 
-  var all = sheet.getRange(1, 1, MAX_ROWS + 1, n);
-  var body = sheet.getRange(2, 1, MAX_ROWS, n);
+  var totalRows = Math.max(sheet.getMaxRows(), MAX_ROWS + 1);
+  ensureSize_(sheet, totalRows, width);
+  var rows = totalRows - 1;
+  var all = sheet.getRange(1, 1, totalRows, width);
+  var body = sheet.getRange(2, 1, rows, width);
 
   // база
   all.setFontFamily('Nunito').setFontSize(10).setFontColor(INK).setVerticalAlignment('middle').setHorizontalAlignment('left')
     .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-  sheet.setRowHeights(2, MAX_ROWS, ROW_HEIGHT);
+  sheet.setRowHeights(2, rows, ROW_HEIGHT);
   body.setBorder(null, null, true, null, null, true, LINE, SpreadsheetApp.BorderStyle.SOLID);
 
   // шапка
-  var header = sheet.getRange(1, 1, 1, n);
-  header.setValues([COLUMNS.map(function (c) { return c.title; })])
-    .setFontWeight('bold').setFontSize(10).setFontColor('#FFFFFF').setHorizontalAlignment('left')
+  sheet.getRange(1, 1, 1, width).setFontWeight('bold').setFontSize(10).setFontColor('#FFFFFF').setHorizontalAlignment('left')
     .setBackground(INK).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
   sheet.setRowHeight(1, HEADER_HEIGHT);
-  COLUMNS.forEach(function (c, i) {
-    var col = i + 1;
+  COLUMNS.forEach(function (c) {
+    var col = layout[c.key];
     sheet.setColumnWidth(col, c.width);
-    var h = sheet.getRange(1, col);
+    var h = sheet.getRange(1, col).setValue(c.title);
     if (c.tech) h.setBackground(TECH);
     if (c.key === 'createdAt' || c.key === 'status') h.setBackground(BRAND);
     // текстові колонки: «звичайний текст» — телефон не перетворюється на число, «=» не стає формулою
-    var colRange = sheet.getRange(2, col, MAX_ROWS, 1);
+    var colRange = sheet.getRange(2, col, rows, 1);
     if (c.kind === 'date') colRange.setNumberFormat('dd.mm.yyyy  HH:mm');
     else if (c.kind === 'day') colRange.setNumberFormat('dd.mm.yyyy');
     else colRange.setNumberFormat('@');
@@ -168,20 +183,19 @@ function setup() {
     if (c.manual) colRange.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
   });
 
-  // дата — по центру, статус — «чіпом»
-  sheet.getRange(2, 1, MAX_ROWS, 1).setFontWeight('bold');
-  sheet.getRange(2, colIndex_('status'), MAX_ROWS, 1).setHorizontalAlignment('center').setFontWeight('bold');
+  // дата — жирним, статус — «чіпом»
+  sheet.getRange(2, layout.createdAt, rows, 1).setFontWeight('bold');
+  var statusRange = sheet.getRange(2, layout.status, rows, 1);
+  statusRange.setHorizontalAlignment('center').setFontWeight('bold');
 
-  // випадаючий список статусів
-  var rule = SpreadsheetApp.newDataValidation()
+  // випадаючий список статусів. Можна вписати й свій статус (з’явиться лише позначка-попередження)
+  statusRange.setDataValidation(SpreadsheetApp.newDataValidation()
     .requireValueInList(Object.keys(STATUSES), true)
-    .setAllowInvalid(false)
-    .build();
-  sheet.getRange(2, colIndex_('status'), MAX_ROWS, 1).setDataValidation(rule);
+    .setAllowInvalid(true)
+    .build());
 
   // умовне форматування: колір статусу + приглушені рядки «Відмова» / «Спам»
   var rules = [];
-  var statusRange = sheet.getRange(2, colIndex_('status'), MAX_ROWS, 1);
   Object.keys(STATUSES).forEach(function (name) {
     rules.push(SpreadsheetApp.newConditionalFormatRule()
       .whenTextEqualTo(name).setBackground(STATUSES[name][0]).setFontColor(STATUSES[name][1])
@@ -192,34 +206,37 @@ function setup() {
     .setFontColor('#9A9EAD').setRanges([body]).build());
   sheet.setConditionalFormatRules(rules);
 
-  // шапка завжди на екрані, перші дві колонки (дата, статус) теж
   sheet.setFrozenRows(1);
-  sheet.setFrozenColumns(2);
+  if (fresh) sheet.setFrozenColumns(2);
   sheet.setTabColor(BRAND);
 
   // фільтр по всій таблиці
   var oldFilter = sheet.getFilter();
   if (oldFilter) oldFilter.remove();
-  sheet.getRange(1, 1, MAX_ROWS + 1, n).createFilter();
+  sheet.getRange(1, 1, totalRows, width).createFilter();
 
-  // технічні колонки — у згорнутій групі («+» над літерами колонок)
-  var firstTech = colIndex_(COLUMNS.filter(function (c) { return c.tech; })[0].key);
-  var techCount = n - firstTech + 1;
-  var techRange = sheet.getRange(1, firstTech, 1, techCount);
-  try {
-    if (!sheet.getColumnGroup(firstTech, 1)) techRange.shiftColumnGroupDepth(1);
-  } catch (e) {
-    techRange.shiftColumnGroupDepth(1);
+  if (fresh) {
+    // службові колонки — у згорнутій групі («+» над літерами колонок)
+    var firstTech = layout[COLUMNS.filter(function (c) { return c.tech; })[0].key];
+    var techRange = sheet.getRange(1, firstTech, 1, width - firstTech + 1);
+    try { if (!sheet.getColumnGroup(firstTech, 1)) techRange.shiftColumnGroupDepth(1); } catch (e) { techRange.shiftColumnGroupDepth(1); }
+    sheet.setColumnGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
+    try { sheet.getColumnGroup(firstTech, 1).collapse(); } catch (e2) { /* вже згорнуто */ }
+    // зайві колонки праворуч і рядки знизу прибираємо — чиста таблиця
+    if (sheet.getMaxColumns() > width) sheet.deleteColumns(width + 1, sheet.getMaxColumns() - width);
+    if (sheet.getMaxRows() > MAX_ROWS + 1) sheet.deleteRows(MAX_ROWS + 2, sheet.getMaxRows() - MAX_ROWS - 1);
   }
-  sheet.setColumnGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
-  try { sheet.getColumnGroup(firstTech, 1).collapse(); } catch (e2) { /* вже згорнуто */ }
 
-  // зайві колонки праворуч і рядки знизу прибираємо — чиста таблиця
-  if (sheet.getMaxColumns() > n) sheet.deleteColumns(n + 1, sheet.getMaxColumns() - n);
-  if (sheet.getMaxRows() > MAX_ROWS + 1) sheet.deleteRows(MAX_ROWS + 2, sheet.getMaxRows() - MAX_ROWS - 1);
+  tagColumns_(sheet, layout);
 
-  buildStats_(ss);
-  ss.setActiveSheet(sheet);
+  var stats = buildStats_(ss);
+  var guide = buildGuide_(ss);
+  buildTech_(ss);
+  if (fresh) {
+    ss.setActiveSheet(guide); ss.moveActiveSheet(ss.getNumSheets() - 1); // Інструкція — передостання (остання — «Технічні дані»)
+    ss.setActiveSheet(stats); ss.moveActiveSheet(2);                    // Аналітика — друга
+  }
+  ss.setActiveSheet(sheet); if (fresh) ss.moveActiveSheet(1);          // Заявки — перша й активна
 
   // секрет для сайту
   var props = PropertiesService.getScriptProperties();
@@ -230,6 +247,22 @@ function setup() {
   }
   ss.toast('Оформлення готове.' + (created ? ' Секрет створено — меню marketingpro → «Показати секрет».' : ''), 'marketingpro', 8);
   if (created) showSecret();
+}
+
+/** Кнопка меню: повертає стандартні кольори, список статусів, ширини й заголовки. Заявки й порядок колонок не чіпає. */
+function resetFormatting() {
+  var ui = SpreadsheetApp.getUi();
+  if (ui.alert('Скинути оформлення',
+    'Буде повернуто стандартні заголовки, кольори статусів, список статусів і ширину колонок. Ваші заявки, коментарі й порядок колонок лишаться.\\n\\nПродовжити?',
+    ui.ButtonSet.YES_NO) === ui.Button.YES) setup();
+}
+
+/** Кнопка меню: перебудовує аркуші «Аналітика» та «Інструкція» під поточний вигляд таблиці (після переставлення колонок). */
+function refreshDocs() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  buildStats_(ss);
+  buildGuide_(ss);
+  ss.toast('Аналітику й інструкцію оновлено.', 'marketingpro', 5);
 }
 
 /** Тиждень за ISO-8601 (пн–нд) у Київському часі: «2026-W40». */
@@ -245,9 +278,10 @@ function isoWeek_(date) {
 
 /** Один клік: найновіші заявки зверху. Запускати вручну, коли зручно (автоматично не сортуємо, щоб рядки не «тікали» від менеджера). */
 function sortNewestFirst() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  var sheet = findSheet_(SpreadsheetApp.getActiveSpreadsheet(), 'leads', SHEET_NAME);
+  var layout = loadLayout_(sheet);
   var last = sheet.getLastRow();
-  if (last > 2) sheet.getRange(2, 1, last - 1, COLUMNS.length).sort({ column: 1, ascending: false });
+  if (last > 2 && layout.createdAt) sheet.getRange(2, 1, last - 1, sheet.getLastColumn()).sort({ column: layout.createdAt, ascending: false });
 }
 
 /** Показує секрет, який треба вписати у Vercel як LEAD_WEBHOOK_SECRET. */
@@ -295,7 +329,9 @@ function argSep_(sh) {
 }
 
 function buildStats_(ss) {
-  var sh = ss.getSheetByName(STATS_SHEET) || ss.insertSheet(STATS_SHEET);
+  var leads = findSheet_(ss, 'leads', SHEET_NAME);
+  var sh = findSheet_(ss, 'stats', STATS_SHEET) || ss.insertSheet(STATS_SHEET);
+  tagSheet_(sh, 'stats');
   sh.getCharts().forEach(function (ch) { sh.removeChart(ch); });
   sh.clear();
   if (sh.getMaxColumns() < 30) sh.insertColumnsAfter(sh.getMaxColumns(), 30 - sh.getMaxColumns());
@@ -308,14 +344,24 @@ function buildStats_(ss) {
   var SEP = argSep_(sh);
   var fx = function (f) { return f.split('¦').join(SEP); };
 
-  var L = "'" + SHEET_NAME + "'!";
-  var lastCol = colLetter_(COLUMNS[COLUMNS.length - 1].key);
+  if (!leads) { sh.getRange('A1').setValue('Аркуш із заявками не знайдено. Меню marketingpro → «Скинути оформлення до стандартного».'); return sh; }
+  loadLayout_(leads);
+  var need = ['createdAt', 'status', 'visit', 'source', 'campaign', 'program', 'pageLabel', 'type', 'day', 'id'];
+  var missing = need.filter(function (k) { return !colIndex_(k); });
+  if (missing.length) {
+    sh.getRange('A1').setValue('Аналітика не може порахувати цифри: у таблиці заявок немає потрібних колонок.').setFontWeight('bold');
+    sh.getRange('A2').setValue('Поверніть колонки (наприклад, меню marketingpro → «Скинути оформлення до стандартного»), потім «Оновити аналітику й інструкцію». Не вистачає: ' +
+      missing.map(function (k) { return COLUMNS.filter(function (c) { return c.key === k; })[0].title; }).join(', '));
+    return sh;
+  }
+  var L = "'" + leads.getName().replace(/'/g, "''") + "'!";
+  var lastCol = letterOf_(Math.max(leads.getLastColumn(), maxOf_(LAYOUT_)));
   var data = L + '$A$1:$' + lastCol + '$' + (MAX_ROWS + 1);
   var rng = function (key) { return L + '$' + colLetter_(key) + '$2:$' + colLetter_(key) + '$' + (MAX_ROWS + 1); };
   var created = rng('createdAt'), status = rng('status'), visit = rng('visit');
 
   sh.getRange('A1').setValue('Заявки marketingpro — зведення').setFontSize(16).setFontWeight('bold');
-  sh.getRange('A2').setValue('Рахується автоматично з аркуша «' + SHEET_NAME + '». Нічого тут не редагуйте.').setFontColor(TECH);
+  sh.getRange('A2').setValue('Рахується автоматично з аркуша «' + leads.getName() + '». Нічого тут не редагуйте.').setFontColor(TECH);
 
   // Ключові цифри — плитки по 3 в ряд (колонки A, E, I)
   var kpi = [
@@ -404,34 +450,38 @@ function buildCharts_(sh, blocks, created, status, fx) {
   [90, 60, 70, 20, 110, 70].forEach(function (w, k) { sh.setColumnWidth(W + k, w); });
 
   var base = { titleTextStyle: { color: INK, fontSize: 13, bold: true }, legend: { position: 'none' }, backgroundColor: '#FFFFFF',
-               chartArea: { left: 44, top: 44, right: 16, bottom: 34 } };
+               chartArea: { left: 44, top: 44 } };
   function opts(chart, o) {
     var all = {}; Object.keys(base).forEach(function (k) { all[k] = base[k]; }); Object.keys(o).forEach(function (k) { all[k] = o[k]; });
     Object.keys(all).forEach(function (k) { chart.setOption(k, all[k]); });
     return chart;
   }
-  function put(chart, row, col, w, h) { sh.insertChart(chart.setPosition(row, col, 4, 4).setOption('width', w).setOption('height', h).build()); }
+  // графіки — приємний додаток: якщо Google не прийме якусь опцію, це не має ламати решту налаштування
+  function put(make, row, col, w, h) {
+    try { sh.insertChart(make().setPosition(row, col, 4, 4).setOption('width', w).setOption('height', h).build()); }
+    catch (e) { console.warn('Графік не побудовано: ' + e); }
+  }
   function block(key) { return blocks.filter(function (b) { return b.key === key; })[0]; }
   function top(b, n) { return sh.getRange(b.row + 1, b.col, n + 1, 2); }
 
   // ряд 1: динаміка (широкий) + статуси (бублик)
-  put(opts(sh.newChart().asColumnChart().addRange(sh.getRange(4, W + 1, 31, 2)).setNumHeaders(1),
-    { title: 'Заявки по днях (30 днів)', colors: [BRAND], vAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, hAxis: { textStyle: { fontSize: 9 }, showTextEvery: 2 }, bar: { groupWidth: '70%' } }),
+  put(function () { return opts(sh.newChart().asColumnChart().addRange(sh.getRange(4, W + 1, 31, 2)).setNumHeaders(1),
+    { title: 'Заявки по днях (30 днів)', colors: [BRAND], vAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, hAxis: { textStyle: { fontSize: 9 } } }); },
     13, 1, 820, 250);
-  put(opts(sh.newChart().asPieChart().addRange(sh.getRange(4, W + 4, stNames.length + 1, 2)).setNumHeaders(1),
-    { title: 'Статуси заявок', pieHole: 0.55, legend: { position: 'right', textStyle: { fontSize: 10 } }, pieSliceText: 'value', chartArea: { left: 12, top: 44, right: 12, bottom: 12 },
-      colors: ['#FF2D7E', '#F5B301', '#3D7BFF', '#1FB56B', '#A7ABBA', '#6B7080'] }),
+  put(function () { return opts(sh.newChart().asPieChart().addRange(sh.getRange(4, W + 4, stNames.length + 1, 2)).setNumHeaders(1),
+    { title: 'Статуси заявок', pieHole: 0.55, legend: { position: 'right', textStyle: { fontSize: 10 } }, pieSliceText: 'value', chartArea: { left: 12, top: 44 },
+      colors: ['#FF2D7E', '#F5B301', '#3D7BFF', '#1FB56B', '#A7ABBA', '#6B7080'] }); },
     13, 9, 400, 250);
 
   // ряд 2: розрізи
-  put(opts(sh.newChart().asBarChart().addRange(top(block('source'), 8)).setNumHeaders(1),
-    { title: 'Заявки за джерелами', colors: [BRAND], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 150, top: 44, right: 16, bottom: 24 } }),
+  put(function () { return opts(sh.newChart().asBarChart().addRange(top(block('source'), 8)).setNumHeaders(1),
+    { title: 'Заявки за джерелами', colors: [BRAND], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 150, top: 44 } }); },
     26, 1, 400, 250);
-  put(opts(sh.newChart().asBarChart().addRange(top(block('campaign'), 8)).setNumHeaders(1),
-    { title: 'Заявки за кампаніями', colors: ['#3D7BFF'], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 150, top: 44, right: 16, bottom: 24 } }),
+  put(function () { return opts(sh.newChart().asBarChart().addRange(top(block('campaign'), 8)).setNumHeaders(1),
+    { title: 'Заявки за кампаніями', colors: ['#3D7BFF'], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 150, top: 44 } }); },
     26, 5, 400, 250);
-  put(opts(sh.newChart().asBarChart().addRange(top(block('pageLabel'), 8)).setNumHeaders(1),
-    { title: 'Звідки заявки (сторінка з формою)', colors: ['#1FB56B'], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 170, top: 44, right: 16, bottom: 24 } }),
+  put(function () { return opts(sh.newChart().asBarChart().addRange(top(block('pageLabel'), 8)).setNumHeaders(1),
+    { title: 'Звідки заявки (сторінка з формою)', colors: ['#1FB56B'], hAxis: { minValue: 0, format: '0', gridlines: { color: LINE } }, chartArea: { left: 170, top: 44 } }); },
     26, 9, 400, 250);
 }
 
@@ -442,32 +492,34 @@ function seedDemoData() {
   if (ui.alert('Демо-дані', 'Додати ' + N + ' вигаданих заявок за останні 30 днів для перевірки таблиці, «Аналітики» й графіків?\n\nЇх можна прибрати меню «Видалити тестові заявки».', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
 
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(SHEET_NAME);
-  if (!sheet) { setup(); sheet = ss.getSheetByName(SHEET_NAME); }
+  var sheet = findSheet_(ss, 'leads', SHEET_NAME);
+  if (!sheet) { setup(); sheet = findSheet_(ss, 'leads', SHEET_NAME); }
 
   var lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
+    var layout = loadLayout_(sheet);
     var leads = demoLeads_(N);
     var start = sheet.getLastRow() + 1;
-    if (start + N - 1 > MAX_ROWS + 1) throw new Error('Не вистачає місця в таблиці.');
-    var rows = leads.map(leadToRow_);
-    sheet.getRange(start, 1, N, COLUMNS.length).setValues(rows);
-    // клікабельні контакти й посилання — одним викликом на колонку
+    ensureRoom_(sheet, start + N);
+    var width = Math.max(sheet.getLastColumn(), maxOf_(layout));
+    var rows = leads.map(function (l) { return rowFromValues_(layout, width, leadValues_(l)); });
+    sheet.getRange(start, 1, N, width).setValues(rows);
+    // клікабельні контакти й посилання — лише там, де є що робити клікабельним (звичайний текст, як номер телефону, не чіпаємо)
     ['contact', 'link'].forEach(function (key) {
-      var rich = leads.map(function (l) {
+      if (!layout[key]) return;
+      leads.forEach(function (l, i) {
         var text = l[key] || '';
         var url = key === 'contact' ? contactUrl_(text) : siteUrl_(text);
-        var b = SpreadsheetApp.newRichTextValue().setText(text);
-        if (url && text) { try { b.setLinkUrl(url); } catch (e) { /* лишаємо текстом */ } }
-        return [b.build()];
+        if (!url || !text) return;
+        try { sheet.getRange(start + i, layout[key]).setRichTextValue(SpreadsheetApp.newRichTextValue().setText(text).setLinkUrl(url).build()); }
+        catch (e) { /* лишаємо звичайним текстом */ }
       });
-      sheet.getRange(start, colIndex_(key), N, 1).setRichTextValues(rich);
     });
   } finally {
     lock.releaseLock();
   }
-  ss.toast('Додано ' + N + ' демо-заявок. Перегляньте аркуш «' + STATS_SHEET + '».', 'marketingpro', 8);
+  ss.toast('Додано ' + N + ' демо-заявок. Перегляньте аркуш «Аналітика».', 'marketingpro', 8);
 }
 
 function demoLeads_(n) {
@@ -548,16 +600,19 @@ function demoLeads_(n) {
  */
 function deleteTestLeads() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(SHEET_NAME);
+  var sheet = findSheet_(ss, 'leads', SHEET_NAME);
   var ui = SpreadsheetApp.getUi();
   var last = sheet ? sheet.getLastRow() : 0;
   if (last < 2) { ui.alert('Заявок ще немає.'); return; }
 
-  var ids = sheet.getRange(2, colIndex_('id'), last - 1, 1).getValues();
-  var sources = sheet.getRange(2, colIndex_('source'), last - 1, 1).getValues();
+  var layout = loadLayout_(sheet);
+  if (!layout.id && !layout.source) { ui.alert('У таблиці немає колонок «Номер заявки» та «Звідки прийшла людина»: не можу відрізнити тестові заявки.'); return; }
+  var ids = layout.id ? sheet.getRange(2, layout.id, last - 1, 1).getValues() : null;
+  var sources = layout.source ? sheet.getRange(2, layout.source, last - 1, 1).getValues() : null;
   var rows = [];
-  for (var i = 0; i < ids.length; i++) {
-    if (/^TEST/i.test(String(ids[i][0])) || String(sources[i][0]).toLowerCase() === 'test') rows.push(i + 2);
+  for (var i = 0; i < last - 1; i++) {
+    var isTest = (ids && /^TEST/i.test(String(ids[i][0]))) || (sources && String(sources[i][0]).toLowerCase() === 'test');
+    if (isTest) rows.push(i + 2);
   }
   if (!rows.length) { ui.alert('Тестових заявок не знайдено.'); return; }
   if (ui.alert('Видалити тестові заявки', 'Знайдено ' + rows.length + ' шт. Видалити їх безповоротно?', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
@@ -566,11 +621,286 @@ function deleteTestLeads() {
   lock.waitLock(20000);
   try {
     for (var j = rows.length - 1; j >= 0; j--) sheet.deleteRow(rows[j]); // знизу вгору, щоб номери не зсувались
-    setup(); // повертає таблиці повний розмір оформлення й перераховує «Аналітику»
   } finally {
     lock.releaseLock();
   }
   ss.toast('Видалено тестових заявок: ' + rows.length, 'marketingpro', 6);
+}
+
+
+/* ------------------------------------------------------------------ *
+ *  Вкладка «Інструкція» — пояснення простими словами (будується з COLUMNS і HOW, тож не розходиться з таблицею)
+ * ------------------------------------------------------------------ */
+
+var GUIDE_SHEET = 'Інструкція';
+
+/** Для кожної колонки: [звідки береться, як заповнюється]. */
+var HOW = {
+  createdAt: ['Сайт', 'Записується автоматично в момент, коли людина надсилає форму (київський час).'],
+  status: ['Команда', 'Нова заявка автоматично отримує «Новий». Далі команда міняє статус зі списку.'],
+  type: ['Сайт', 'Автоматично: заявка зі сторінки Академії або з вибраним курсом — «Академія», усі інші — «Консультація».'],
+  program: ['Людина у формі', 'Людина сама вибирає напрям у блоці «Цікавить навчання?». Є лише на сторінці Академії й необовʼязкове.'],
+  name: ['Людина у формі', 'Людина вводить сама. Необовʼязкове поле.'],
+  contact: ['Людина у формі', 'Людина вводить сама. Єдине обовʼязкове поле: без нього форма не відправиться.'],
+  link: ['Людина у формі', 'Людина вводить сама. Необовʼязкове. Таблиця сама робить посилання клікабельним.'],
+  niche: ['Людина у формі', 'Людина вводить сама. Необовʼязкове поле.'],
+  quality: ['Сайт', 'Рахується автоматично: скільки з трьох полів (імʼя, лінк, ніша) людина заповнила.'],
+  source: ['Посилання, з якого зайшла людина', 'Сайт бере мітку з рекламного посилання. Якщо міток нема — дивиться, з якого сайту чи застосунку прийшли; якщо нікуди — «direct» (зайшли напряму).'],
+  campaign: ['Мітка в рекламному посиланні', 'Береться з мітки utm_campaign у посиланні реклами. Щоб заповнювалось, додавайте мітки до посилань в рекламі.'],
+  responsible: ['Команда', 'Вписується вручну.'],
+  nextContact: ['Команда', 'Вписується вручну: дата, коли повернутись до людини.'],
+  manager: ['Команда', 'Вписується вручну.'],
+  id: ['Сайт', 'Створюється автоматично, щойно людина відкрила форму. Захищає від дублів, якщо людина натиснула кнопку двічі.'],
+  day: ['Таблиця', 'Рахується автоматично з дати заявки.'],
+  week: ['Таблиця', 'Рахується автоматично з дати заявки.'],
+  month: ['Таблиця', 'Рахується автоматично з дати заявки.'],
+  pageLabel: ['Сайт', 'Автоматично: сторінка, на якій людина натиснула «Надіслати».'],
+  page: ['Сайт', 'Автоматично: технічна адреса тієї ж сторінки.'],
+  medium: ['Мітка в рекламному посиланні', 'Береться з мітки utm_medium, якщо вона була в посиланні.'],
+  content: ['Мітка в рекламному посиланні', 'Береться з мітки utm_content, якщо вона була в посиланні.'],
+  term: ['Мітка в рекламному посиланні', 'Береться з мітки utm_term, якщо вона була в посиланні.'],
+  clickId: ['Рекламне посилання', 'Meta чи Google самі додають цей код до посилання, коли людина клікає по рекламі.'],
+  referrer: ['Браузер людини', 'Адреса, з якої перейшли на сайт. Браузер передає її сам; з Instagram і Telegram часто буває порожньою.'],
+  landing: ['Сайт (памʼять браузера)', 'Перша сторінка візиту. Сайт запамʼятовує її на час візиту.'],
+  casesViewed: ['Сайт (памʼять браузера)', 'Сайт рахує, які кейси людина відкривала до заявки.'],
+  pagesViewed: ['Сайт (памʼять браузера)', 'Сайт рахує, скільки сторінок людина відкрила за візит.'],
+  timeOnSite: ['Сайт (памʼять браузера)', 'Рахується від початку візиту до натискання «Надіслати».'],
+  visit: ['Сайт (памʼять браузера)', 'Сайт запамʼятовує в браузері, що людина вже була. Якщо вона очистила історію, вважається новою.'],
+  firstVisit: ['Сайт (памʼять браузера)', 'Дата, коли сайт вперше побачив цей браузер. Якщо історію очищено, дата новa.'],
+  country: ['Хостинг сайту (Vercel)', 'Визначається автоматично за інтернет-адресою. Може помилятись (VPN, мобільний інтернет).'],
+  region: ['Хостинг сайту (Vercel)', 'Визначається автоматично за інтернет-адресою. Може помилятись.'],
+  city: ['Хостинг сайту (Vercel)', 'Визначається автоматично за інтернет-адресою. Може помилятись.'],
+  device: ['Браузер людини', 'Розпізнається автоматично з технічного опису браузера.'],
+  lang: ['Браузер людини', 'Передається браузером автоматично.'],
+  tz: ['Браузер людини', 'Передається браузером автоматично.'],
+  viewport: ['Браузер людини', 'Передається браузером автоматично.'],
+  fbp: ['Cookie від Meta', 'Зʼявляється лише коли на сайті підключений Meta Pixel. Зараз майже завжди порожньо.'],
+  fbc: ['Cookie від Meta', 'Зʼявляється, коли людина прийшла з реклами Meta і підключений Meta Pixel.'],
+  ipHash: ['Сайт', 'Зашифрований відбиток інтернет-адреси. Саму адресу не зберігаємо.'],
+  ua: ['Браузер людини', 'Передається браузером автоматично.']
+};
+
+function buildGuide_(ss) {
+  var sh = findSheet_(ss, 'guide', GUIDE_SHEET) || ss.insertSheet(GUIDE_SHEET);
+  tagSheet_(sh, 'guide');
+  sh.clear();
+  // Назви колонок беремо з поточної шапки (їх могли перейменувати); мітки колонок дають актуальні позиції
+  var leadsSheet = findSheet_(ss, 'leads', SHEET_NAME), titleOf = function (c) { return c.title; };
+  if (leadsSheet) {
+    var lay = loadLayout_(leadsSheet), heads = leadsSheet.getRange(1, 1, 1, Math.max(1, leadsSheet.getLastColumn())).getValues()[0];
+    titleOf = function (c) { return (lay[c.key] && heads[lay[c.key] - 1]) || c.title; };
+  }
+  sh.setHiddenGridlines(true);
+  sh.setTabColor('#F5B301');
+  if (sh.getMaxColumns() < 4) sh.insertColumnsAfter(sh.getMaxColumns(), 4 - sh.getMaxColumns());
+  [250, 400, 280, 430].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+
+  var rows = []; // [вид, A, B, C, D]
+  var add = function (kind, a, b, c, d) { rows.push([kind, a || '', b || '', c || '', d || '']); };
+
+  add('title', 'Інструкція: як працює таблиця заявок');
+  add('sub', 'Ця вкладка оновлюється сама, тому нічого в ній не редагуйте.');
+  add('gap');
+
+  add('h', '1. Коротко: що це і навіщо');
+  add('p', 'Коли людина заповнює форму на сайті (консультація або запис на навчання), її заявка сама зʼявляється в аркуші «Заявки» за кілька секунд.');
+  add('p', 'Вносити заявки вручну не треба. Ваша робота: обробляти їх, міняти статус і записувати, про що домовились.');
+  add('p', 'Аркуш «Аналітика» сам рахує цифри й малює графіки: скільки заявок, звідки прийшли, скільки стали клієнтами.');
+  add('gap');
+
+  add('h', '2. Як працювати щодня');
+  add('p', '1.  Відкрийте аркуш «Заявки». Нові заявки зʼявляються внизу списку. Щоб бачити найновіші зверху: меню marketingpro → «Нові зверху».');
+  add('p', '2.  Напишіть або подзвоніть за контактом із колонки «Телефон або Telegram для звʼязку». Telegram-нік — це посилання, на нього можна натиснути.');
+  add('p', '3.  Змініть «Статус» зі списку. Він підсвічується кольором, тому одразу видно, що нове, а що в роботі.');
+  add('p', '4.  Впишіть, хто веде заявку («Відповідальний»), коли повернутись («Наступний контакт») і що домовились («Коментар менеджера»).');
+  add('p', '5.  Щоб знайти потрібні заявки, натисніть значок воронки в шапці колонки. Наприклад, лише «Новий» або лише «Академія».');
+  add('p', '6.  Цифри й графіки дивіться в аркуші «Аналітика».');
+  add('gap');
+
+  add('h', '3. Що можна (майже все)');
+  add('b', '•  Міняти статус і писати в «Відповідальний», «Наступний контакт», «Коментар менеджера». Правити можна будь-яку клітинку.');
+  add('b', '•  Переставляти, ховати, вставляти нові й видаляти непотрібні колонки. Скрипт знаходить колонки за внутрішніми мітками, порядок неважливий.');
+  add('b', '•  Перейменовувати заголовки колонок і навіть аркуші «Заявки», «Аналітика», «Інструкція».');
+  add('b', '•  Додавати свої колонки де завгодно: сайт їх не чіпає й нічого в них не пише.');
+  add('b', '•  Видаляти, переміщувати й сортувати рядки, залишати порожні рядки між заявками. Нова заявка запишеться під останнім заповненим рядком.');
+  add('b', '•  Міняти кольори, шрифти, ширину колонок, закріплення, фільтри.');
+  add('b', '•  Міняти статуси: додавати свої (просто впишіть у клітинку або додайте у Дані → Перевірка даних), міняти кольори (Формат → Умовне форматування).');
+  add('b', '•  Ділитися таблицею з колегами, яким можна бачити контакти клієнтів.');
+  add('gap');
+
+  add('h', '4. Що варто памʼятати');
+  add('b', '•  Не видаляйте колонку «Телефон або Telegram для звʼязку»: без неї заявку нікуди записати. Сайт покаже людині помилку, а заявка збережеться в журналі сайту.');
+  add('b', '•  Статуси «Новий», «Клієнт» і «Спам» краще не перейменовувати: від них залежить аркуш «Аналітика» (нова заявка завжди отримує «Новий»).');
+  add('b', '•  Колонку «Номер заявки» можна ховати, але не видаляйте: вона захищає від дублів, якщо людина натиснула кнопку двічі.');
+  add('b', '•  Після переставлення чи видалення колонок натисніть меню marketingpro → «Оновити аналітику й інструкцію», щоб цифри й довідник підлаштувались.');
+  add('b', '•  «Скинути оформлення до стандартного» повертає стандартні заголовки, кольори й список статусів. Заявки й порядок колонок лишаються.');
+  add('b', '•  Давайте доступ лише тим, кому можна бачити контакти клієнтів: у таблиці персональні дані.');
+  add('b', '•  Технічні деталі (акаунти, де що лежить, що робити при поломці) записані на вкладці «Технічні дані». Скрипт її не перезаписує, вписуйте туди зміни.');
+  add('gap');
+
+  add('h', '5. Як заявка потрапляє в таблицю');
+  add('p', '1.  Людина заповнює форму на сайті й натискає кнопку.');
+  add('p', '2.  Сайт перевіряє: чи вказано контакт, чи це не бот (спам відсікається), чи заявку не надіслано двічі.');
+  add('p', '3.  Сайт додає службові дані: звідки прийшла людина, які кейси дивилась, з якого пристрою і міста.');
+  add('p', '4.  Заявка передається сюди й записується новим рядком.');
+  add('p', '5.  Якщо таблиця раптом недоступна, сайт спробує ще раз, а людині покаже наш Telegram. Повна заявка збережеться в журналі сайту.');
+  add('gap');
+
+  add('h', '6. Статуси');
+  add('th', 'Статус', 'Що означає');
+  Object.keys(STATUSES).forEach(function (name) {
+    var text = {
+      'Новий': 'Щойно надійшла, ще ніхто не звʼязувався. Ставиться автоматично.',
+      'Зв’язались': 'Вже написали або подзвонили.',
+      'В роботі': 'Йдуть перемовини.',
+      'Клієнт': 'Купив або записався. Рахується в конверсії на аркуші «Аналітика».',
+      'Відмова': 'Не підійшло. Причину допишіть у коментарі менеджера.',
+      'Спам': 'Фейкова або помилкова заявка. У конверсії не рахується.'
+    }[name];
+    add('chip', name, text);
+  });
+  add('gap');
+
+  add('h', '7. Довідник: що означає кожна колонка, звідки береться і як заповнюється');
+  add('th', 'Колонка', 'Що означає', 'Звідки береться', 'Як заповнюється');
+  add('sec', 'На виду');
+  COLUMNS.filter(function (c) { return !c.tech; }).forEach(function (c) { add('tr', titleOf(c), c.hint, HOW[c.key][0], HOW[c.key][1]); });
+  add('sec', 'Службові (згорнуті: кнопка «+» над літерами колонок)');
+  COLUMNS.filter(function (c) { return c.tech; }).forEach(function (c) { add('tr', titleOf(c), c.hint, HOW[c.key][0], HOW[c.key][1]); });
+  add('gap');
+
+  add('h', '8. Кнопки меню «marketingpro» (угорі над таблицею)');
+  add('th', 'Кнопка', 'Що робить');
+  add('tr', 'Нові зверху (відсортувати)', 'Один раз сортує заявки від нових до старих. Автоматично не сортується, щоб рядки не «тікали» під час роботи.');
+  add('tr', 'Оновити аналітику й інструкцію', 'Перебудовує аркуші «Аналітика» та «Інструкція» під поточний вигляд таблиці. Робіть після зміни колонок.');
+  add('tr', 'Додати тестову заявку', 'Додає один тестовий рядок, щоб перевірити, що все працює.');
+  add('tr', 'Додати демо-дані (80 заявок)', 'Додає вигадані заявки за 30 днів, щоб побачити, як виглядають фільтри, аналітика й графіки.');
+  add('tr', 'Видалити тестові заявки', 'Прибирає тестові й демо-заявки (їхній номер починається з TEST). Справжні заявки не чіпає.');
+  add('tr', 'Показати секрет для сайту', 'Потрібна лише розробнику для налаштування сайту. Нікому не показуйте.');
+  add('tr', 'Скинути оформлення до стандартного', 'Повертає стандартні заголовки, кольори, список статусів і ширину колонок. Заявки й порядок колонок лишаються.');
+  add('gap');
+
+  add('h', '9. Якщо щось не так');
+  add('th', 'Ситуація', 'Що робити');
+  add('tr', 'Заявка не зʼявилась', 'Зачекайте хвилину й оновіть сторінку. Якщо її досі нема, напишіть розробнику: заявка збережена в журналі сайту.');
+  add('tr', 'В аркуші «Аналітика» помилки (#ERROR або #REF)', 'Меню marketingpro → «Оновити аналітику й інструкцію». Якщо не допомогло, можливо видалено потрібну колонку: «Скинути оформлення до стандартного».');
+  add('tr', 'Таблиця виглядає зʼїхавшою', 'Меню marketingpro → «Скинути оформлення до стандартного». Дані не постраждають.');
+  add('tr', 'Треба прибрати тестові рядки', 'Меню marketingpro → «Видалити тестові заявки».');
+  add('tr', 'Хочу побачити, звідки береться якась колонка', 'Довідник у розділі 7: там для кожної колонки написано, звідки береться значення і як воно заповнюється.');
+  add('gap');
+
+  add('h', '10. Приватність');
+  add('p', 'У таблиці імена й контакти людей. Давайте доступ лише тим, хто працює із заявками, а старі заявки видаляйте, коли вони більше не потрібні.');
+  add('p', 'Інтернет-адресу відвідувача ми не зберігаємо, тільки зашифрований відбиток. Він потрібен лише для пошуку спаму.');
+
+  var n = rows.length;
+  sh.getRange(1, 1, n, 4).setValues(rows.map(function (r) { return r.slice(1); }));
+  sh.getRange(1, 1, n, 4).setFontFamily('Nunito').setFontSize(10).setFontColor(INK).setVerticalAlignment('top').setWrapStrategy(SpreadsheetApp.WrapStrategy.OVERFLOW);
+
+  rows.forEach(function (r, i) {
+    var row = i + 1, kind = r[0], line = sh.getRange(row, 1, 1, 4);
+    if (kind === 'title') sh.getRange(row, 1).setFontSize(20).setFontWeight('bold');
+    else if (kind === 'sub') sh.getRange(row, 1).setFontColor(TECH);
+    else if (kind === 'h') { line.setBackground(INK).setFontColor('#FFFFFF').setFontWeight('bold').setFontSize(12).setVerticalAlignment('middle'); sh.setRowHeight(row, 30); }
+    else if (kind === 'th') line.setBackground(TECH).setFontColor('#FFFFFF').setFontWeight('bold').setVerticalAlignment('middle');
+    else if (kind === 'sec') line.setBackground('#F6F7FA').setFontWeight('bold').setFontColor(BRAND);
+    else if (kind === 'chip') {
+      sh.getRange(row, 1).setBackground(STATUSES[r[1]][0]).setFontColor(STATUSES[r[1]][1]).setFontWeight('bold').setHorizontalAlignment('center');
+      sh.getRange(row, 2).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+      line.setBorder(null, null, true, null, null, null, LINE, SpreadsheetApp.BorderStyle.SOLID);
+    } else if (kind === 'tr') {
+      line.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP).setBorder(null, null, true, null, null, null, LINE, SpreadsheetApp.BorderStyle.SOLID);
+      sh.getRange(row, 1).setFontWeight('bold');
+    }
+  });
+  sh.getRange(1, 1, n, 1).setHorizontalAlignment('left');
+  sh.autoResizeRows(1, n);
+  return sh;
+}
+
+
+/* ------------------------------------------------------------------ *
+ *  Вкладка «Технічні дані» — акаунти, де що лежить, що робити при поломці.
+ *  Створюється один раз і більше НЕ перезаписується (її заповнюють вручну).
+ * ------------------------------------------------------------------ */
+
+var TECH_SHEET = 'Технічні дані';
+
+function buildTech_(ss) {
+  if (findSheet_(ss, 'tech', TECH_SHEET)) return; // вже є — не чіпаємо, там ручні записи
+  var sh = ss.insertSheet(TECH_SHEET);
+  tagSheet_(sh, 'tech');
+  sh.setHiddenGridlines(true);
+  sh.setTabColor('#3D7BFF');
+  if (sh.getMaxColumns() < 4) sh.insertColumnsAfter(sh.getMaxColumns(), 4 - sh.getMaxColumns());
+  [230, 430, 300, 430].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+
+  var rows = [];
+  var add = function (kind, a, b, c, d) { rows.push([kind, a || '', b || '', c || '', d || '']); };
+
+  add('title', 'Технічні дані: акаунти й де що лежить');
+  add('sub', 'Паролі тут не зберігаємо. Жовті клітинки треба вписати вручну. Цю вкладку скрипт не перезаписує, вносьте сюди зміни самі.');
+  add('gap');
+
+  add('h', '1. Акаунти й сервіси');
+  add('th', 'Що', 'Де / адреса', 'Чий акаунт (пошта)', 'Примітка');
+  add('tr', 'GitHub (код сайту)', 'https://github.com/svitlanaogneva-cyber/marketingpro', 'Акаунт: svitlanaogneva-cyber. Пошта акаунта: [вписати]', 'Гілка main. Кожен push у main автоматично збирається й публікується.');
+  add('tr', 'Vercel (хостинг сайту)', 'https://vercel.com → проєкт marketingpro', 'Акаунт або команда: [вписати]. Пошта: [вписати]', 'Проєкт підключений до GitHub-репозиторію. Тут змінні середовища (Environment Variables) і журнали (Logs).');
+  add('tr', 'Домен', 'marketingpro.company', 'Де куплений і де керується DNS: [вписати]', 'Додається у Vercel → Settings → Domains.');
+  add('tr', 'Google-акаунт власника цієї таблиці', 'Ця таблиця й Apps Script', 'marketingpro.ua@gmail.com (за даними Google, скрипт запущено від цього акаунта)', 'Скрипт працює від імені цього акаунта. Якщо його видалити або закрити доступ, форма перестане писати в таблицю.');
+  add('tr', 'Apps Script (прийом заявок)', 'Ця таблиця → Розширення → Apps Script (проєкт «marketingpro»)', 'Той самий Google-акаунт', 'Розгортання: Ввести в дію → Керувати введеннями в дію.');
+  add('tr', 'Фото для сайту', '[посилання на папку Google Диска]', '[вписати]', 'За ТЗ усі фото складаємо на Google Диску.');
+  add('tr', 'Meta Pixel / аналітика', 'Поки не підключено', '—', 'Після підключення в таблиці почнуть заповнюватись технічні мітки Meta.');
+  add('gap');
+
+  add('h', '2. Секрети й змінні (самі значення тут НЕ записуємо)');
+  add('th', 'Що', 'Де лежить', 'Для чого');
+  add('tr', 'LEAD_SECRET', 'Apps Script → ⚙ Налаштування проєкту → Властивості скрипта', 'Пароль між сайтом і таблицею. Без нього таблиця не приймає заявки.');
+  add('tr', 'LEAD_WEBHOOK_SECRET', 'Vercel → Settings → Environment Variables', 'Те саме значення, що й LEAD_SECRET. Мають збігатися.');
+  add('tr', 'LEAD_WEBHOOK_URL', 'Vercel → Settings → Environment Variables', 'Адреса веб-застосунку Apps Script (закінчується на /exec). Беруть з: Ввести в дію → Керувати введеннями в дію.');
+  add('tr', 'NEXT_PUBLIC_SITE_URL', 'Vercel → Settings → Environment Variables (необовʼязково)', 'Домен сайту для метатегів. За замовчуванням https://marketingpro.company.');
+  add('gap');
+
+  add('h', '3. Як усе звʼязано');
+  add('p', 'Людина відкриває сайт (Vercel) → заповнює форму → сайт перевіряє заявку й додає службові дані (/api/lead) → передає в Apps Script → скрипт дописує рядок у цю таблицю.');
+  add('p', 'Код сайту лежить у GitHub. Коли в main зʼявляється нова версія, Vercel сам збирає й публікує її за 1–2 хвилини. Перед цим GitHub Actions перевіряє, що нічого не зламано.');
+  add('gap');
+
+  add('h', '4. Типові дії');
+  add('th', 'Ситуація', 'Що робити');
+  add('tr', 'Змінити текст на сайті', 'Правка в GitHub-репозиторії (теки content/ і components/), потім push у main. Vercel сам опублікує.');
+  add('tr', 'Форма не відправляється', 'Vercel → проєкт → Logs: шукайте [lead:FAILED]. Перевірте змінні LEAD_WEBHOOK_URL і LEAD_WEBHOOK_SECRET та що розгортання Apps Script має доступ «Усі».');
+  add('tr', 'Оновили код скрипта', 'Apps Script → Ввести в дію → Керувати введеннями → ✏️ → Версія: Нова → Ввести в дію. Адреса не зміниться.');
+  add('tr', 'Треба змінити секрет', 'Змініть його в Apps Script (LEAD_SECRET) і у Vercel (LEAD_WEBHOOK_SECRET) на однакове значення, потім зробіть Redeploy у Vercel.');
+  add('tr', 'Змінити власника таблиці або акаунт', 'Скрипт працює від імені власника. Перенесіть таблицю разом зі скриптом, заново зробіть розгортання й оновіть LEAD_WEBHOOK_URL у Vercel.');
+  add('gap');
+
+  add('h', '5. Відкриті правки з ТЗ');
+  add('th', 'Що', 'Стан');
+  add('tr', 'Змінити шрифт пунктів меню та інших елементів на інший', 'Відкрито');
+  add('tr', 'Замінити фото у відгуках на фото зі стоку', 'Відкрито');
+  add('tr', 'Замінити іконку сайту (favicon)', 'Відкрито');
+
+  var n = rows.length;
+  sh.getRange(1, 1, n, 4).setValues(rows.map(function (r) { return r.slice(1); }));
+  sh.getRange(1, 1, n, 4).setFontFamily('Nunito').setFontSize(10).setFontColor(INK).setVerticalAlignment('top').setWrapStrategy(SpreadsheetApp.WrapStrategy.OVERFLOW);
+  rows.forEach(function (r, i) {
+    var row = i + 1, kind = r[0], line = sh.getRange(row, 1, 1, 4);
+    if (kind === 'title') sh.getRange(row, 1).setFontSize(20).setFontWeight('bold');
+    else if (kind === 'sub') sh.getRange(row, 1).setFontColor(TECH);
+    else if (kind === 'h') { line.setBackground(INK).setFontColor('#FFFFFF').setFontWeight('bold').setFontSize(12).setVerticalAlignment('middle'); sh.setRowHeight(row, 30); }
+    else if (kind === 'th') line.setBackground(TECH).setFontColor('#FFFFFF').setFontWeight('bold').setVerticalAlignment('middle');
+    else if (kind === 'tr') {
+      line.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP).setBorder(null, null, true, null, null, null, LINE, SpreadsheetApp.BorderStyle.SOLID);
+      sh.getRange(row, 1).setFontWeight('bold');
+      // клітинки, які треба заповнити вручну, підсвічуємо жовтим
+      [1, 2, 3, 4].forEach(function (col) {
+        if (String(r[col]).indexOf('[вписати') >= 0 || String(r[col]).indexOf('[посилання') >= 0) sh.getRange(row, col).setBackground('#FFF3BF');
+      });
+    }
+  });
+  sh.autoResizeRows(1, n);
+  ss.setActiveSheet(sh); ss.moveActiveSheet(ss.getNumSheets());
 }
 
 /* ------------------------------------------------------------------ *
@@ -606,21 +936,22 @@ function writeLead_(lead) {
   lock.waitLock(20000);
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet) { setup(); sheet = ss.getSheetByName(SHEET_NAME); }
+    var sheet = findSheet_(ss, 'leads', SHEET_NAME);
+    if (!sheet) { setup(); sheet = findSheet_(ss, 'leads', SHEET_NAME); }
+    var layout = loadLayout_(sheet);
+    // без контакту заявка втрачена — краще віддати помилку (сайт збереже заявку в журналі), ніж мовчки загубити
+    if (!layout.contact) throw new Error('У таблиці немає колонки «Телефон або Telegram для звʼязку»: заявку не збережено.');
 
-    var idCol = colIndex_('id');
     var last = sheet.getLastRow();
-    if (lead.id && last > 1) {
-      var found = sheet.getRange(2, idCol, last - 1, 1).createTextFinder(String(lead.id)).matchEntireCell(true).findNext();
+    if (lead.id && layout.id && last > 1) {
+      var found = sheet.getRange(2, layout.id, last - 1, 1).createTextFinder(String(lead.id)).matchEntireCell(true).findNext();
       if (found) return { row: found.getRow(), duplicate: true };
     }
 
     var row = last + 1;
-    if (row > MAX_ROWS + 1) throw new Error('Таблиця заповнена (' + MAX_ROWS + ' заявок). Перенесіть старі в архів.');
-
-    var values = leadToRow_(lead);
-    sheet.getRange(row, 1, 1, COLUMNS.length).setValues([values]);
+    ensureRoom_(sheet, row);
+    var width = Math.max(sheet.getLastColumn(), maxOf_(layout));
+    sheet.getRange(row, 1, 1, width).setValues([rowFromValues_(layout, width, leadValues_(lead))]);
 
     // клікабельні контакти й посилання — косметика: заявка вже записана, тому збій тут не має її «провалювати»
     try {
@@ -635,23 +966,46 @@ function writeLead_(lead) {
   }
 }
 
+/** Якщо рядки закінчуються — додає ще 1000 із тим самим оформленням (формат і список статусів). */
+function ensureRoom_(sheet, row) {
+  while (row >= sheet.getMaxRows()) {
+    var max = sheet.getMaxRows(), cols = sheet.getMaxColumns();
+    sheet.insertRowsAfter(max, 1000);
+    var src = sheet.getRange(max, 1, 1, cols), dst = sheet.getRange(max + 1, 1, 1000, cols);
+    src.copyTo(dst, SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+    src.copyTo(dst, SpreadsheetApp.CopyPasteType.PASTE_DATA_VALIDATION, false);
+  }
+}
+
 /** Заявка → масив значень у порядку колонок COLUMNS (спільний для запису з сайту й демо-даних). */
-function leadToRow_(lead) {
+function leadValues_(lead) {
   var created = lead.createdAt ? new Date(lead.createdAt) : new Date();
-  return COLUMNS.map(function (c) {
-    if (c.manual) return '';
-    if (c.key === 'status') return lead.status || 'Новий';
-    if (c.key === 'createdAt') return created;
-    if (c.key === 'day') return Utilities.formatDate(created, TIMEZONE, 'yyyy-MM-dd');
-    if (c.key === 'month') return Utilities.formatDate(created, TIMEZONE, 'yyyy-MM');
-    if (c.key === 'week') return isoWeek_(created);
-    if (c.key === 'firstVisit' && lead.firstVisit) {
-      var fv = new Date(lead.firstVisit);
-      if (!isNaN(fv.getTime())) return Utilities.formatDate(fv, TIMEZONE, 'dd.MM.yyyy HH:mm');
+  var out = {};
+  COLUMNS.forEach(function (c) {
+    if (c.manual) return; // колонки для команди сайт не чіпає
+    var v;
+    if (c.key === 'status') v = lead.status || 'Новий';
+    else if (c.key === 'createdAt') v = created;
+    else if (c.key === 'day') v = Utilities.formatDate(created, TIMEZONE, 'yyyy-MM-dd');
+    else if (c.key === 'month') v = Utilities.formatDate(created, TIMEZONE, 'yyyy-MM');
+    else if (c.key === 'week') v = isoWeek_(created);
+    else if (c.key === 'firstVisit' && lead.firstVisit && !isNaN(new Date(lead.firstVisit).getTime())) {
+      v = Utilities.formatDate(new Date(lead.firstVisit), TIMEZONE, 'dd.MM.yyyy HH:mm');
+    } else {
+      v = lead[c.key];
+      v = v === undefined || v === null ? '' : String(v);
     }
-    var v = lead[c.key];
-    return v === undefined || v === null ? '' : String(v);
+    out[c.key] = v;
   });
+  return out;
+}
+
+/** {ключ: значення} → рядок під поточну розкладку (порожні клітинки для чужих колонок). */
+function rowFromValues_(layout, width, values) {
+  var row = [];
+  for (var i = 0; i < width; i++) row.push('');
+  Object.keys(values).forEach(function (k) { if (layout[k]) row[layout[k] - 1] = values[k]; });
+  return row;
 }
 
 /* ------------------------------------------------------------------ *
@@ -670,15 +1024,86 @@ function safeEqual_(a, b) {
   return diff === 0;
 }
 
+/* ------------------------------------------------------------------ *
+ *  Розкладка колонок і аркушів. Колонки й аркуші знаходяться за невидимими мітками (developer metadata),
+ *  які рухаються разом із ними: колонки можна переставляти, вставляти, ховати, видаляти, а аркуші перейменовувати.
+ * ------------------------------------------------------------------ */
+
+var LAYOUT_ = null; // {ключ колонки: номер колонки}; null = стандартний порядок COLUMNS
+
+function maxOf_(map) {
+  var m = 0;
+  Object.keys(map).forEach(function (k) { if (map[k] > m) m = map[k]; });
+  return m;
+}
+
+/** Аркуш за міткою ролі (знайдеться навіть перейменований); запасний варіант — за стандартною назвою. */
+function findSheet_(ss, role, fallbackName) {
+  try {
+    var found = ss.createDeveloperMetadataFinder().withKey('mp_sheet').withValue(role).find();
+    for (var i = 0; i < found.length; i++) {
+      var loc = found[i].getLocation();
+      if (loc.getLocationType() === SpreadsheetApp.DeveloperMetadataLocationType.SHEET) return loc.getSheet();
+    }
+  } catch (e) { /* міток нема — шукаємо за назвою */ }
+  return ss.getSheetByName(fallbackName);
+}
+
+function tagSheet_(sheet, role) {
+  try {
+    sheet.getParent().createDeveloperMetadataFinder().withKey('mp_sheet').withValue(role).find()
+      .forEach(function (m) { m.remove(); });
+    sheet.addDeveloperMetadata('mp_sheet', role, SpreadsheetApp.DeveloperMetadataVisibility.DOCUMENT);
+  } catch (e) { console.warn('Мітку аркуша не додано: ' + e); }
+}
+
+/** {ключ: номер колонки} за мітками. Порожній результат = міток нема. */
+function readTags_(sheet) {
+  var map = {};
+  try {
+    sheet.createDeveloperMetadataFinder().withKey('mp_col').find().forEach(function (m) {
+      var loc = m.getLocation();
+      if (loc.getLocationType() === SpreadsheetApp.DeveloperMetadataLocationType.COLUMN) map[m.getValue()] = loc.getColumn().getColumn();
+    });
+  } catch (e) { map = {}; }
+  return map;
+}
+
+function tagColumns_(sheet, layout) {
+  try {
+    sheet.createDeveloperMetadataFinder().withKey('mp_col').find().forEach(function (m) { m.remove(); });
+    var rows = sheet.getMaxRows();
+    COLUMNS.forEach(function (c) {
+      sheet.getRange(1, layout[c.key], rows, 1).addDeveloperMetadata('mp_col', c.key, SpreadsheetApp.DeveloperMetadataVisibility.DOCUMENT);
+    });
+  } catch (e) { console.warn('Мітки колонок не додано (працюємо за позиціями): ' + e); }
+}
+
+/** Поточна розкладка аркуша заявок. Без міток — стандартний порядок. */
+function loadLayout_(sheet) {
+  var map = readTags_(sheet);
+  if (!Object.keys(map).length) COLUMNS.forEach(function (c, i) { map[c.key] = i + 1; });
+  LAYOUT_ = map;
+  return map;
+}
+
+/** Номер колонки за ключем; 0, якщо такої колонки в таблиці нема (видалили). */
 function colIndex_(key) {
+  if (LAYOUT_) return LAYOUT_[key] || 0;
   for (var i = 0; i < COLUMNS.length; i++) if (COLUMNS[i].key === key) return i + 1;
-  throw new Error('Немає колонки ' + key);
+  return 0;
+}
+
+function letterOf_(n) {
+  var s = '';
+  while (n > 0) { var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - m) / 26); }
+  return s;
 }
 
 function colLetter_(key) {
-  var n = colIndex_(key), s = '';
-  while (n > 0) { var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - m) / 26); }
-  return s;
+  var n = colIndex_(key);
+  if (!n) throw new Error('Немає колонки ' + key);
+  return letterOf_(n);
 }
 
 function ensureSize_(sheet, rows, cols) {
@@ -687,7 +1112,7 @@ function ensureSize_(sheet, rows, cols) {
 }
 
 function linkCell_(sheet, row, key, url) {
-  if (!url) return;
+  if (!url || !colIndex_(key)) return;
   var cell = sheet.getRange(row, colIndex_(key));
   var text = String(cell.getValue());
   if (!text) return;

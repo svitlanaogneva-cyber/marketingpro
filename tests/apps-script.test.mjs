@@ -194,3 +194,8 @@ test("група службових колонок: стара група зі �
   for (let c = firstTech; c <= 42; c++) assert.equal(sheet.depth[c], 1, `службова колонка ${c} має бути в групі`);
   assert.equal(sheet.collapsedFrom, firstTech);
 });
+
+test("у текстах діалогів і підказок немає буквальних «\\n» (мають бути справжні переноси рядків)", () => {
+  const bad = code.split("\n").map((l, i) => [i + 1, l]).filter(([, l]) => l.includes("\\\\n") && !/\/.*\\\\n.*\/[gimsuy]*[.,;)]/.test(l));
+  assert.deepEqual(bad, []);
+});

@@ -21,7 +21,8 @@
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-npm run ci         # те саме, що робить GitHub Actions: типи + збірка + перевірка HTML
+npm test           # юніт-тести логіки заявок
+npm run ci         # те саме, що робить GitHub Actions: типи + тести + збірка + перевірка HTML
 ```
 
 ## Деплой
@@ -46,8 +47,14 @@ GitHub Actions (`.github/workflows/ci.yml`) на кожен push/PR переві
 - `sitemap.xml`, `robots.txt`, canonical, Open Graph/Twitter, JSON-LD (`ProfessionalService`, `BreadcrumbList`).
 - Домен для метаданих береться з `NEXT_PUBLIC_SITE_URL` (за замовчуванням `https://marketingpro.company`).
 
+## Заявки з форм
+
+Форми (консультація на всіх сторінках, запис на курс в академії) відправляють `POST /api/lead` →
+Google Sheets через Apps Script. Налаштування, структура таблиці й безпека —
+[`integrations/google-sheets/README.md`](integrations/google-sheets/README.md).
+На Vercel потрібні змінні `LEAD_WEBHOOK_URL` і `LEAD_WEBHOOK_SECRET` (див. `.env.example`).
+
 ## Що ще не зроблено
 
-- Форма заявки поки заглушка (`lib/effects.ts`, блок «форма»): треба Route Handler `/api/lead`
-  (Google Sheet + Telegram + Meta Pixel `Lead`).
+- Пуш заявки в Telegram і Meta Pixel `Lead` (на клієнті вже викликається `fbq('track','Lead')`, якщо Pixel підключено).
 - Контраст рожевого `#ff2d7e` на білому (3.45:1) нижче за WCAG AA для дрібного тексту — питання до дизайну.

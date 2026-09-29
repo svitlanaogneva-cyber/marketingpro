@@ -8,6 +8,8 @@
  * ідемпотентна (перевірка «вже ініціалізовано»), щоб не ламатись у StrictMode.
  */
 
+import { collectAttribution, trackPageview } from "./attribution";
+
 type Cleanup = () => void;
 
 const $$ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) =>
@@ -26,6 +28,8 @@ export function initEffects(): Cleanup {
     handler: (e: any) => void,
     opts: AddEventListenerOptions = {},
   ) => target.addEventListener(type, handler, { ...opts, signal });
+
+  trackPageview();
 
   /* ================= anim.js ================= */
 
@@ -485,8 +489,15 @@ export function initEffects(): Cleanup {
     };
     const val = (name: string) => (form.elements.namedItem(name) as HTMLInputElement | null)?.value.trim() ?? "";
 
+    const submitBtn = form.querySelector<HTMLButtonElement>("button[type=submit]");
+    const submitLabel = submitBtn?.innerHTML ?? "";
+    /* Один ID на всі спроби цієї форми: повторна відправка (подвійний клік, ретрай) не створить дубль у таблиці */
+    const submissionId = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b % 32]).join("");
+    let sending = false;
+
     on(form, "submit", async (e: Event) => {
       e.preventDefault();
+      if (sending) return;
       if (val("company") !== "") return; // honeypot
 
       const contact = val("contact");
@@ -496,19 +507,54 @@ export function initEffects(): Cleanup {
         return;
       }
       showError("contact", "");
+      showError("form", "");
 
-      /* TODO(prod): реальна відправка — POST на Route Handler (/api/lead) →
-         Google Sheet + пуш у Telegram + подія Meta Pixel `Lead`.
-         Поки — заглушка стану «успіх», як і в статичній версії. */
-      const payload = { link: val("link"), contact, name: val("name"), niche: val("niche"), prog: val("prog") };
-      console.log("[marketingpro] заявка (заглушка):", payload);
+      sending = true;
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Надсилаємо…"; }
 
-      const btn = form.querySelector<HTMLButtonElement>("button[type=submit]");
-      if (btn) { btn.disabled = true; btn.textContent = "Надсилаємо…"; }
-      await new Promise((r) => setTimeout(r, reduce ? 0 : 550));
+      const payload = {
+        id: submissionId,
+        contact,
+        name: val("name"),
+        link: val("link"),
+        niche: val("niche"),
+        prog: (form.querySelector<HTMLInputElement>('input[name="prog"]:checked')?.value ?? "").trim(),
+        company: val("company"),
+        page: location.pathname,
+        referrer: document.referrer,
+        lang: navigator.language,
+        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        viewport: `${window.innerWidth}x${window.innerHeight}`,
+        attr: collectAttribution(),
+      };
 
-      if (fields) fields.style.display = "none";
-      success?.classList.add("show");
+      try {
+        const res = await fetch("/api/lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          keepalive: true,
+        });
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        if (!res.ok || !data.ok) {
+          if (data.error === "contact_required" || data.error === "contact_too_short") {
+            showError("contact", "Лишіть телефон або Telegram");
+            document.getElementById("contactField")?.focus();
+            throw new Error("validation");
+          }
+          throw new Error(data.error || String(res.status));
+        }
+        if (fields) fields.style.display = "none";
+        success?.classList.add("show");
+        (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq?.("track", "Lead");
+      } catch (err) {
+        if ((err as Error).message !== "validation") {
+          showError("form", "Не вдалося надіслати заявку. Спробуйте ще раз або напишіть нам у Telegram: @marketingpro_ua");
+        }
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = submitLabel; }
+      } finally {
+        sending = false;
+      }
     });
 
     /* напрям навчання — необовʼязкове поле; кнопка «Записатися» з картки програми відмічає чіп */

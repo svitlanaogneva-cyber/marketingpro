@@ -99,6 +99,7 @@ export default function Contact() {
                   Безкоштовна консультація{" "}
                   <span className="arr" aria-hidden="true">→</span>
                 </button>
+                <div className="err" id="err-form" role="alert" aria-live="assertive"></div>
               </div>
               <div className="form-success" id="formSuccess" role="status" aria-live="polite">
                 <div className="big">Прийнято ▸</div>

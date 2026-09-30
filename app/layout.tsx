@@ -27,9 +27,6 @@ const nunito = Nunito_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  icons: {
-    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF2D7E'/%3E%3Ctext x='16' y='24' font-family='monospace' font-size='21' font-weight='700' text-anchor='middle' fill='%23fff'%3Em%3C/text%3E%3C/svg%3E",
-  },
 };
 
 export const viewport: Viewport = { themeColor: "#FDFCFC" };

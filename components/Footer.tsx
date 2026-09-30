@@ -17,13 +17,13 @@ export default function Footer() {
             </div>
             <div className="foot-cols">
               <div className="foot-col">
-                <h4>сайт</h4>
+                <p className="foot-h">сайт</p>
                 <Link href="/#services">Послуги</Link>
                 <Link href="/cases">Кейси</Link>
                 <Link href="/#founder">Про агенцію</Link>
               </div>
               <div className="foot-col">
-                <h4>контакти</h4>
+                <p className="foot-h">контакти</p>
                 <a href="https://www.instagram.com/marketingpro.company/" target="_blank" rel="noopener">Instagram</a>
                 <a href="https://t.me/marketingpro_ua" target="_blank" rel="noopener">Telegram</a>
                 <a href="viber://chat?number=%2B380637194373">Viber</a>
@@ -31,7 +31,7 @@ export default function Footer() {
                 <a href="mailto:marketingpro.ua@gmail.com">Пошта</a>
               </div>
               <div className="foot-col">
-                <h4>дія</h4>
+                <p className="foot-h">дія</p>
                 <Link href="/#contact">Безкоштовна консультація</Link>
                 <Link href="/academy">Академія</Link>
               </div>

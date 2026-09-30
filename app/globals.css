@@ -42,12 +42,13 @@
   --inv-base: #F1F1EE;      /* база інверсних токенів — світле на темному */
   --ink:     #18181A;       /* нейтральна туш, без брунатності */
   --signal:  #FF2D7E;       /* рожевий з лого — один на весь сайт */
+  --signal-ink: #D6124F;    /* той самий рожевий, трохи глибший: контраст ≥4.5:1 на світлому тлі й під білим текстом (WCAG AA) */
 
   /* похідні — сірий задає колір, а не opacity: інакше кожен блок мав свою
      прозорість і на сайті жило з десяток різних сірих */
   --tx:        var(--ink);
   --tx-soft:   color-mix(in srgb, var(--ink) 74%, var(--paper));
-  --tx-mute:   color-mix(in srgb, var(--ink) 55%, var(--paper));
+  --tx-mute:   color-mix(in srgb, var(--ink) 65%, var(--paper));
   --line:      color-mix(in srgb, var(--ink) 14%, transparent);
   --line-2:    color-mix(in srgb, var(--ink) 26%, transparent);
 
@@ -159,7 +160,7 @@ p { text-wrap: pretty; }
   display: inline-flex; align-items: center; gap: 7px;
   font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold);
   letter-spacing: var(--ls-caps); text-transform: uppercase;
-  color: var(--signal); background: none; padding: 0; border-radius: 0;
+  color: var(--signal-ink); background: none; padding: 0; border-radius: 0;
 }
 /* рисочки «//» прибрано: прийом із коду нічого не каже клієнтам агенції */
 .label--inv { color: var(--signal); background: none; }
@@ -181,6 +182,7 @@ p { text-wrap: pretty; }
 .svc-head .h2 + .label::before { content: none; }
 
 .sig { color: var(--signal); }
+.nums .sig { color: var(--signal-ink); } /* цифри в білих картках кейса: AA-контраст */
 
 /* ---- layout ---- */
 .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
@@ -199,13 +201,13 @@ p { text-wrap: pretty; }
 .btn:active { transform: scale(.98); }
 .btn { transition: background .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease), transform .12s var(--ease); }
 .btn:hover .arr { transform: translateX(5px); }
-.btn--signal { background: var(--signal); border-color: var(--signal); color: var(--white); font-weight: var(--fw-ui); }
+.btn--signal { background: var(--signal-ink); border-color: var(--signal-ink); color: var(--white); font-weight: var(--fw-ui); }
 /* ореол замість підняття: кнопка лишається на місці, але набирає ваги */
-.btn--signal:hover { background: var(--signal); border-color: var(--signal); box-shadow: var(--flare); }
+.btn--signal:hover { background: var(--signal-ink); border-color: var(--signal-ink); box-shadow: var(--flare); }
 /* другорядна дія — рожевий контур без заливки; на наведенні рожевий серпанок.
    Одна на весь сайт: раніше була сірою напівпрозорою, а в кейсах і академії
    її перефарбовували окремими правилами */
-.btn--ghost { background: transparent; color: var(--signal); border-color: var(--signal); }
+.btn--ghost { background: transparent; color: var(--signal-ink); border-color: var(--signal-ink); }
 .btn--ghost:hover { background: color-mix(in srgb, var(--signal) 10%, transparent); }
 .btn--lg { padding: 13px 26px; font-size: var(--fs-small); }
 :focus-visible { outline: 2.5px solid var(--signal); outline-offset: 3px; border-radius: var(--r-hair); }
@@ -240,7 +242,8 @@ p { text-wrap: pretty; }
 /* колір лого й бургера мусить перемикатися разом із тлом шапки,
    інакше на переході чорне лого встигає блимнути на чорному */
 .brand { font-family: var(--f-display); font-weight: var(--fw-heavy); font-size: var(--fs-logo); letter-spacing: var(--ls-display); color: var(--tx); transition: color .18s var(--ease); }
-.brand-pro { color: var(--signal); }
+.brand-pro { color: var(--signal-ink); }
+.site-header.is-dark .brand-pro { color: var(--signal); }
 .site-header.is-dark .brand { color: var(--inv); }
 .nav-links { display: flex; gap: 2px; }
 .nav-links a { font-family: var(--f-body); font-size: var(--fs-small); padding: 8px 13px; border-radius: var(--r-cta); color: var(--tx-soft); transition: color .18s var(--ease); }
@@ -458,7 +461,7 @@ body.menu-open .nav-toggle span::after { transform: rotate(-45deg); }
 
 .ccard .nm { display: block; font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h5); line-height: var(--lh-title); letter-spacing: var(--ls-heading); margin-bottom: 9px; }
 .ccard .ttl { display: block; font-size: var(--fs-small); line-height: var(--lh-compact); color: var(--tx-soft); }
-.ccard .go { font-family: var(--f-body); font-size: var(--fs-meta); color: var(--signal); display: flex; align-items: center; gap: 8px; }
+.ccard .go { font-family: var(--f-body); font-size: var(--fs-meta); color: var(--signal-ink); display: flex; align-items: center; gap: 8px; }
 .ccard .go .arr { transition: transform .3s var(--ease); }
 .ccard:hover .go .arr { transform: translateX(5px); }
 
@@ -555,7 +558,7 @@ body.menu-open .nav-toggle span::after { transform: rotate(-45deg); }
    гасимо — крок між парами тримає сам грід */
 .cc-two--blocks { align-items: start; }
 .cc-two--blocks > .cc-block { margin-bottom: 0; }
-.cc-h { font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--signal); margin-bottom: 12px; }
+.cc-h { font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--signal-ink); margin-bottom: 12px; }
 .cc-block { margin-bottom: clamp(30px, 4vw, 48px); }
 /* Розділи кейсу мають два рівні, а не сім однакових ярликів: головні — назвою
    шрифтом заголовків, службові («Про проєкт», підписи до скрінів) лишаються
@@ -583,7 +586,7 @@ body.menu-open .nav-toggle span::after { transform: rotate(-45deg); }
 .road-step::before { content: ""; position: absolute; left: 17px; top: 36px; bottom: calc(-1 * var(--road-gap)); width: 1px; background: color-mix(in srgb, var(--signal) 55%, transparent); }
 .road-step:last-child::before { content: none; }
 .road-step { position: relative; padding-left: 58px; }
-.road-no { position: absolute; left: 0; top: -2px; width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--signal) 45%, transparent); border-radius: 50%; background: var(--paper); font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold); letter-spacing: var(--ls-caps); color: var(--signal); }
+.road-no { position: absolute; left: 0; top: -2px; width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--signal) 45%, transparent); border-radius: 50%; background: var(--paper); font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold); letter-spacing: var(--ls-caps); color: var(--signal-ink); }
 .road-h { font-family: var(--f-display); font-weight: var(--fw-ui); font-size: var(--fs-h5); line-height: var(--lh-title); letter-spacing: var(--ls-title); margin-bottom: 12px; padding-top: 6px; }
 .road-list { list-style: none; display: grid; gap: 8px; }
 .road-list li { position: relative; padding-left: 18px; font-size: var(--fs-small); line-height: var(--lh-compact); color: var(--tx-soft); }
@@ -680,7 +683,7 @@ body.menu-open .nav-toggle span::after { transform: rotate(-45deg); }
 .dyn th { font-size: var(--fs-caps); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--tx-mute); font-weight: var(--fw-ui); }
 .dyn td b { font-family: var(--f-display); font-weight: var(--fw-ui); letter-spacing: var(--ls-title); }
 .dyn tr:last-child td { border-bottom: none; }
-.dyn tr:last-child td b { color: var(--signal); }
+.dyn tr:last-child td b { color: var(--signal-ink); }
 
 /* карусель скрінів: кабінет — широкі кадри, відгуки — вужчі, кілька в ряд */
 .gal { position: relative; }
@@ -875,7 +878,7 @@ body.lbox-open { overflow: hidden; }
   background: color-mix(in srgb, var(--signal) 8%, transparent);
   font-family: var(--f-body); font-size: var(--fs-caps); font-weight: var(--fw-bold);
   letter-spacing: var(--ls-caps); text-transform: uppercase;
-  color: var(--signal);
+  color: var(--signal-ink);
 }
 /* назва курсу рожевим — картка читається як окрема пропозиція, а не як
    черговий підрозділ сторінки */
@@ -1053,7 +1056,7 @@ body.lbox-open { overflow: hidden; }
 /* опис під логотипом — приглушений сірий: підпис, а не заголовок */
 .foot-brand p { font-size: var(--fs-small); line-height: var(--lh-body); color: var(--inv-mute); }
 .foot-cols { display: flex; gap: clamp(36px, 6vw, 80px); flex-wrap: wrap; }
-.foot-col h4 { font-family: var(--f-body); font-size: var(--fs-caps); text-transform: uppercase; letter-spacing: var(--ls-caps); color: var(--signal); margin-bottom: 14px; font-weight: var(--fw-bold); }
+.foot-col .foot-h { font-family: var(--f-body); font-size: var(--fs-caps); text-transform: uppercase; letter-spacing: var(--ls-caps); color: var(--signal); margin-bottom: 14px; font-weight: var(--fw-bold); }
 .foot-col a { display: block; font-family: var(--f-body); font-size: var(--fs-ui); color: var(--inv-soft); padding: 5px 0; transition: color .2s; }
 .foot-col a:hover { color: var(--inv); }
 /* Академія — той самий рожевий, що й у меню: єдиний кольоровий пункт підвалу,
@@ -1192,7 +1195,7 @@ body.lbox-open { overflow: hidden; }
   }
   /* дві картки програм — це п'ять екранів суцільних списків. На телефоні
      лишаємо видимими назву й опис, решту розгортаємо на дотик */
-  .prog-toggle { display: grid; grid-template-columns: 1fr 16px; align-items: center; gap: 16px; width: 100%; margin-top: 20px; padding: 16px 0 0; border-top: 1px solid var(--line); text-align: left; font-family: var(--f-body); font-size: var(--fs-ui); font-weight: var(--fw-ui); color: var(--signal); }
+  .prog-toggle { display: grid; grid-template-columns: 1fr 16px; align-items: center; gap: 16px; width: 100%; margin-top: 20px; padding: 16px 0 0; border-top: 1px solid var(--line); text-align: left; font-family: var(--f-body); font-size: var(--fs-ui); font-weight: var(--fw-ui); color: var(--signal-ink); }
   .prog-toggle .qa-ic { justify-self: end; }
   .prog-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s var(--ease-expo); }
   .prog-body > div { display: block; overflow: hidden; }

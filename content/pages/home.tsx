@@ -8,7 +8,7 @@ export default function Home() {
       <section className="hero hero--card">
         <div className="hero-card fade">
           <div className="hero-photo" aria-hidden="true">
-            <Image src="/assets/img/hero-bg.jpg" alt="" width="2000" height="1500" sizes="100vw" priority />
+            <Image src="/assets/img/hero-bg.jpg" alt="" width="2000" height="1500" sizes="100vw" preload />
           </div>
           <div className="label-group">
             <span className="label">Таргет</span>

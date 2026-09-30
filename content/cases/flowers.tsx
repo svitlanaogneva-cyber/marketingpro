@@ -22,7 +22,7 @@ export default function CaseFlowers() {
           </Link>
         </div>
         <figure className="chero-media">
-          <Image src="/assets/img/cases/flowers/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
+          <Image src="/assets/img/cases/flowers/cover.jpg" alt="Кейс marketingpro: Мережа магазинів квітів" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
           <figcaption>
             <b>4,28$</b>
             <i>

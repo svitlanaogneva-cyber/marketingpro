@@ -24,7 +24,7 @@ export default function CaseFurniture() {
           </Link>
         </div>
         <figure className="chero-media">
-          <Image src="/assets/img/cases/furniture/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
+          <Image src="/assets/img/cases/furniture/cover.jpg" alt="Кейс marketingpro: Виробництво меблів" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
           <figcaption>
             <b>167</b>
             <i>

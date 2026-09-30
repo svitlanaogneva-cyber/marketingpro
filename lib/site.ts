@@ -5,7 +5,7 @@ import meta from "@/content/meta.json";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://marketingpro.company").replace(/\/$/, "");
 export const SITE_NAME = "marketingpro";
 
-type PageMeta = { title: string; description: string; canonical: string; ogImage: string; ogType: string; ld: object[] };
+type PageMeta = { title: string; description: string; canonical: string; ogImage: string; ogType: string; ld: object[]; updated: string };
 
 export type CaseMeta = PageMeta & {
   slug: string;

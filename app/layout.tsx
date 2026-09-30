@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import StickyCta from "@/components/StickyCta";
 import Lightbox from "@/components/Lightbox";
 import Effects from "@/components/Effects";
+import Analytics from "@/components/Analytics";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <StickyCta />
         <Lightbox />
         <Effects />
+        <Analytics />
       </body>
     </html>
   );

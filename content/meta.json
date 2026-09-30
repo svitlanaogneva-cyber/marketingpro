@@ -6,25 +6,8 @@
       "canonical": "https://marketingpro.company/",
       "ogImage": "https://marketingpro.company/og/home.png",
       "ogType": "website",
-      "ld": [
-        {
-          "@context": "https://schema.org",
-          "@type": "ProfessionalService",
-          "name": "marketingpro — агенція таргетованої реклами",
-          "description": "Performance-маркетинг у Meta Ads: воронки, що приносять підтверджені продажі.",
-          "areaServed": "UA",
-          "founder": {
-            "@type": "Person",
-            "name": "Світлана Ліщишина"
-          },
-          "knowsAbout": [
-            "Meta Ads",
-            "Performance-маркетинг",
-            "Таргетована реклама",
-            "ROAS"
-          ]
-        }
-      ]
+      "ld": [],
+      "updated": "2026-09-30"
     },
     "academy": {
       "title": "Академія таргетованої реклами — marketingpro | навчання Meta Ads на кейсах",
@@ -32,7 +15,8 @@
       "canonical": "https://marketingpro.company/academy",
       "ogImage": "https://marketingpro.company/og/academy.png",
       "ogType": "website",
-      "ld": []
+      "ld": [],
+      "updated": "2026-09-30"
     },
     "cases-index": {
       "title": "Кейси — marketingpro | результати таргетованої реклами в Meta Ads",
@@ -40,7 +24,8 @@
       "canonical": "https://marketingpro.company/cases",
       "ogImage": "https://marketingpro.company/og/cases.png",
       "ogType": "website",
-      "ld": []
+      "ld": [],
+      "updated": "2026-09-30"
     }
   },
   "cases": [
@@ -84,7 +69,8 @@
       "next": {
         "slug": "language",
         "name": "Школа іноземних мов"
-      }
+      },
+      "updated": "2026-09-30"
     },
     {
       "slug": "bags",
@@ -126,7 +112,8 @@
       "next": {
         "slug": "flowers",
         "name": "Мережа магазинів квітів"
-      }
+      },
+      "updated": "2026-09-30"
     },
     {
       "slug": "beauty",
@@ -168,7 +155,8 @@
       "next": {
         "slug": "gym",
         "name": "Запуск спортзалу з нуля"
-      }
+      },
+      "updated": "2026-09-30"
     },
     {
       "slug": "dental",
@@ -210,7 +198,8 @@
       "next": {
         "slug": "beauty",
         "name": "Студія краси повного циклу"
-      }
+      },
+      "updated": "2026-09-30"
     },
     {
       "slug": "flowers",
@@ -252,7 +241,8 @@
       "next": {
         "slug": "dental",
         "name": "Стоматологічна клініка"
-      }
+      },
+      "updated": "2026-09-30"
     },
     {
       "slug": "furniture",
@@ -291,7 +281,8 @@
       "next": {
         "slug": "apparel",
         "name": "Український бренд одягу з власним виробництвом"
-      }
+      },
+      "updated": "2026-09-30"
     },
     {
       "slug": "gym",
@@ -333,7 +324,8 @@
       "next": {
         "slug": "keratin",
         "name": "Майстер кератину"
-      }
+      },
+      "updated": "2026-09-30"
     },
     {
       "slug": "keratin",
@@ -372,7 +364,8 @@
         "slug": "gym",
         "name": "Запуск спортзалу з нуля"
       },
-      "next": null
+      "next": null,
+      "updated": "2026-09-30"
     },
     {
       "slug": "language",
@@ -414,7 +407,8 @@
       "next": {
         "slug": "bags",
         "name": "Онлайн-магазин жіночих сумок"
-      }
+      },
+      "updated": "2026-09-30"
     }
   ]
 }

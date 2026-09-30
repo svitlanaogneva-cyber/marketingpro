@@ -15,7 +15,7 @@ export default function CasesIndex() {
         <div className="ccards-grid" id="caseCards">
           <Link className="ccard" href="/cases/furniture">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/furniture/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/furniture/cover.jpg" alt="Кейс marketingpro: Виробництво меблів" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">2584%</span>
@@ -37,7 +37,7 @@ export default function CasesIndex() {
           {" "}
           <Link className="ccard" href="/cases/apparel">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/apparel/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/apparel/cover.jpg" alt="Кейс marketingpro: Український бренд одягу з власним виробництвом" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">×10</span>
@@ -59,7 +59,7 @@ export default function CasesIndex() {
           {" "}
           <Link className="ccard" href="/cases/language">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/language/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/language/cover.jpg" alt="Кейс marketingpro: Школа іноземних мов" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">1168%</span>
@@ -81,7 +81,7 @@ export default function CasesIndex() {
           {" "}
           <Link className="ccard" href="/cases/bags">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/bags/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/bags/cover.jpg" alt="Кейс marketingpro: Онлайн-магазин жіночих сумок" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">961%</span>
@@ -103,7 +103,7 @@ export default function CasesIndex() {
           {" "}
           <Link className="ccard" href="/cases/flowers">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/flowers/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/flowers/cover.jpg" alt="Кейс marketingpro: Мережа магазинів квітів" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">4,28$</span>
@@ -125,7 +125,7 @@ export default function CasesIndex() {
           {" "}
           <Link className="ccard" href="/cases/dental">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/dental/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/dental/cover.jpg" alt="Кейс marketingpro: Стоматологічна клініка" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">×3</span>
@@ -147,7 +147,7 @@ export default function CasesIndex() {
           {" "}
           <Link className="ccard" href="/cases/beauty">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/beauty/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/beauty/cover.jpg" alt="Кейс marketingpro: Студія краси повного циклу" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">829%</span>
@@ -169,7 +169,7 @@ export default function CasesIndex() {
           {" "}
           <Link className="ccard" href="/cases/gym">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/gym/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/gym/cover.jpg" alt="Кейс marketingpro: Запуск спортзалу з нуля" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">837%</span>
@@ -191,7 +191,7 @@ export default function CasesIndex() {
           {" "}
           <Link className="ccard" href="/cases/keratin">
             <span className="ccard-media">
-              <Image src="/assets/img/cases/keratin/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+              <Image src="/assets/img/cases/keratin/cover.jpg" alt="Кейс marketingpro: Майстер кератину" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
               {" "}
               <span className="ccard-fallback" aria-hidden="true">
                 <span className="v">929%</span>

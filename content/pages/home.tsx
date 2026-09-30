@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { FAQ } from "@/content/faq";
 
 export default function Home() {
   return (
@@ -211,7 +212,7 @@ export default function Home() {
           <div className="gal-track" tabIndex={0} role="group" aria-label="Кейси агенції">
             <Link className="ccard" href="/cases/furniture?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/furniture/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/furniture/cover.jpg" alt="Кейс marketingpro: Виробництво меблів" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">2584%</span>
@@ -233,7 +234,7 @@ export default function Home() {
             {" "}
             <Link className="ccard" href="/cases/apparel?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/apparel/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/apparel/cover.jpg" alt="Кейс marketingpro: Український бренд одягу з власним виробництвом" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">×10</span>
@@ -255,7 +256,7 @@ export default function Home() {
             {" "}
             <Link className="ccard" href="/cases/language?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/language/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/language/cover.jpg" alt="Кейс marketingpro: Школа іноземних мов" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">1168%</span>
@@ -277,7 +278,7 @@ export default function Home() {
             {" "}
             <Link className="ccard" href="/cases/bags?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/bags/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/bags/cover.jpg" alt="Кейс marketingpro: Онлайн-магазин жіночих сумок" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">961%</span>
@@ -299,7 +300,7 @@ export default function Home() {
             {" "}
             <Link className="ccard" href="/cases/flowers?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/flowers/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/flowers/cover.jpg" alt="Кейс marketingpro: Мережа магазинів квітів" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">4,28$</span>
@@ -321,7 +322,7 @@ export default function Home() {
             {" "}
             <Link className="ccard" href="/cases/dental?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/dental/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/dental/cover.jpg" alt="Кейс marketingpro: Стоматологічна клініка" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">×3</span>
@@ -343,7 +344,7 @@ export default function Home() {
             {" "}
             <Link className="ccard" href="/cases/beauty?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/beauty/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/beauty/cover.jpg" alt="Кейс marketingpro: Студія краси повного циклу" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">829%</span>
@@ -365,7 +366,7 @@ export default function Home() {
             {" "}
             <Link className="ccard" href="/cases/gym?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/gym/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/gym/cover.jpg" alt="Кейс marketingpro: Запуск спортзалу з нуля" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">837%</span>
@@ -387,7 +388,7 @@ export default function Home() {
             {" "}
             <Link className="ccard" href="/cases/keratin?from=home">
               <span className="ccard-media">
-                <Image src="/assets/img/cases/keratin/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
+                <Image src="/assets/img/cases/keratin/cover.jpg" alt="Кейс marketingpro: Майстер кератину" width="900" height="675" sizes="(max-width: 700px) 100vw, 420px" />
                 {" "}
                 <span className="ccard-fallback" aria-hidden="true">
                   <span className="v">929%</span>
@@ -513,7 +514,7 @@ export default function Home() {
       </section>
       <section className="wrap">
         <div className="academy" id="academy">
-          <Image className="academy-ava" src="/assets/img/academy.jpg" width="800" height="800" alt="" />
+          <Image className="academy-ava" src="/assets/img/academy.jpg" width="800" height="800" alt="Ноутбук і блокнот на столі" />
           <div className="academy-txt">
             <h3>Академія таргетованої реклами</h3>
             <p>
@@ -532,57 +533,21 @@ export default function Home() {
             <h2 className="h2" data-split="">Часті запитання</h2>
           </div>
           <div className="faq-list">
-            <div className="qa">
-              <button className="qa-q" type="button" aria-expanded="false">
-                <h3>З яким бюджетом ви працюєте?</h3>
-                <span className="qa-ic" aria-hidden="true"></span>
-              </button>
-              <div className="qa-a">
-                <div>
-                  <p>
-                    Ми працюємо з різними бюджетами, але перед стартом завжди розробляємо стратегію саме під ваш бізнес, ваші цілі та ваш бюджет.
-                  </p>
+            {FAQ.map((item) => (
+              <div className="qa" key={item.q}>
+                <button className="qa-q" type="button" aria-expanded="false">
+                  <h3>{item.q}</h3>
+                  <span className="qa-ic" aria-hidden="true"></span>
+                </button>
+                <div className="qa-a">
+                  <div>
+                    {item.a.map((t) => (
+                      <p key={t}>{t}</p>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="qa">
-              <button className="qa-q" type="button" aria-expanded="false">
-                <h3>Через скільки будуть заявки?</h3>
-                <span className="qa-ic" aria-hidden="true"></span>
-              </button>
-              <div className="qa-a">
-                <div>
-                  <p>
-                    Перші заявки зазвичай надходять в перші дні після запуску реклами. Далі працюємо над покращенням та масштабуванням результатів.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="qa">
-              <button className="qa-q" type="button" aria-expanded="false">
-                <h3>Як я бачитиму, куди йдуть гроші?</h3>
-                <span className="qa-ic" aria-hidden="true"></span>
-              </button>
-              <div className="qa-a">
-                <div>
-                  <p>
-                    Ми надаємо щоденну звітність по цифрах: скільки витрачено, кількість заявок, вартість заявки, ROAS та інші показники.
-                  </p>
-                  <p>Також у вас завжди є повний доступ до рекламного кабінету з усіма показниками.</p>
-                </div>
-              </div>
-            </div>
-            <div className="qa">
-              <button className="qa-q" type="button" aria-expanded="false">
-                <h3>Кому належить рекламний кабінет?</h3>
-                <span className="qa-ic" aria-hidden="true"></span>
-              </button>
-              <div className="qa-a">
-                <div>
-                  <p>Вам. Усі активи залишаються вашими навіть після припинення співпраці.</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

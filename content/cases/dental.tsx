@@ -24,7 +24,7 @@ export default function CaseDental() {
           </Link>
         </div>
         <figure className="chero-media">
-          <Image src="/assets/img/cases/dental/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
+          <Image src="/assets/img/cases/dental/cover.jpg" alt="Кейс marketingpro: Стоматологічна клініка" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
           <figcaption>
             <b>×3</b>
             <i>

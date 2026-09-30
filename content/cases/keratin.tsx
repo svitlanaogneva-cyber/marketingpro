@@ -23,7 +23,7 @@ export default function CaseKeratin() {
           </Link>
         </div>
         <figure className="chero-media">
-          <Image src="/assets/img/cases/keratin/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
+          <Image src="/assets/img/cases/keratin/cover.jpg" alt="Кейс marketingpro: Майстер кератину" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
           <figcaption>
             <b>50</b>
             <i>

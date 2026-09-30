@@ -51,6 +51,16 @@ for (const [route, file] of routes) {
   if (descriptions.has(desc)) fail(route, "дубль meta description");
   titles.add(title); descriptions.add(desc);
 
+  const ldTypes = [...html.matchAll(/"@type":"([A-Za-z]+)"/g)].map((m) => m[1]);
+  const need = { "/": ["ProfessionalService", "WebSite", "FAQPage"], "/academy": ["Course", "BreadcrumbList"], "/cases": ["ItemList", "BreadcrumbList"] }[route] || (route.startsWith("/cases/") ? ["BreadcrumbList"] : []);
+  for (const t of need) if (!ldTypes.includes(t)) fail(route, `немає JSON-LD типу ${t}`);
+  if (route === "/") {
+    const faqVisible = (html.match(/class="qa-q"/g) || []).length;
+    const faqLd = (html.match(/"@type":"Question"/g) || []).length;
+    if (faqVisible !== faqLd) fail(route, `FAQ у розмітці (${faqLd}) не збігається з видимим (${faqVisible})`);
+  }
+  if (/<img(?![^>]*id="lboxImg")[^>]*\salt=""/.test(html) && route !== "/") fail(route, "є зображення з порожнім alt");
+
   for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     try { JSON.parse(m[1]); } catch { fail(route, "невалідний JSON-LD"); }
   }

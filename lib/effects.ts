@@ -546,7 +546,9 @@ export function initEffects(): Cleanup {
         }
         if (fields) fields.style.display = "none";
         success?.classList.add("show");
-        (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq?.("track", "Lead");
+        const w = window as unknown as { fbq?: (...a: unknown[]) => void; gtag?: (...a: unknown[]) => void };
+        w.fbq?.("track", "Lead");
+        w.gtag?.("event", "generate_lead");
       } catch (err) {
         if ((err as Error).message !== "validation") {
           showError("form", "Не вдалося надіслати заявку. Спробуйте ще раз або напишіть нам у Telegram: @marketingpro_ua");

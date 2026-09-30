@@ -23,7 +23,7 @@ export default function CaseBeauty() {
           </Link>
         </div>
         <figure className="chero-media">
-          <Image src="/assets/img/cases/beauty/cover.jpg" alt="" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
+          <Image src="/assets/img/cases/beauty/cover.jpg" alt="Кейс marketingpro: Студія краси повного циклу" width="900" height="675" sizes="(max-width: 900px) 100vw, 640px" />
           <figcaption>
             <b>829%</b>
             <i>

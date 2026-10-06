@@ -267,6 +267,13 @@ body.menu-open .site-header.is-dark { background: var(--paper); }
 body.menu-open .site-header.is-dark .brand { color: var(--tx); }
 body.menu-open .site-header.is-dark .nav-toggle span::before,
 body.menu-open .site-header.is-dark .nav-toggle span::after { background: var(--ink); }
+/* відкрите меню має світле тло — пункти не мають біліти, як на темній шапці */
+body.menu-open .site-header.is-dark .nav-links a,
+body.menu-open .site-header.is-dark .nav-links a:not(.btn):not([href$="academy.html"]):hover,
+body.menu-open .site-header.is-dark .nav-links a:not(.btn):not([href$="academy.html"])[aria-current="page"] { color: var(--tx); }
+body.menu-open .site-header.is-dark .nav-links a[href$="academy.html"] { color: var(--signal); }
+body.menu-open .site-header.is-dark .nav-links .nav-cta { color: var(--white); }
+body.menu-open .site-header.is-dark .nav-links .nav-contacts a { color: var(--tx-soft); }
 body.menu-open .nav-toggle span { background: transparent; }
 body.menu-open .nav-toggle span::before { transform: rotate(45deg); }
 body.menu-open .nav-toggle span::after { transform: rotate(-45deg); }
